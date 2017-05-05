@@ -1,0 +1,27 @@
+<div class="modal-content">
+	<div class="modal-header" style="text-align: center">
+		<h3 class="modal-title">Make a Trade</h3>
+	</div>
+	<div class="modal-body" *ngIf="!showConfirmTrade">
+		<form (ngSubmit)="executeTrade()" style="text-align: center">
+			<div style="display: inline-block">
+				Action
+				<select class="form-control" style="margin:4px" [(ngModel)]="action" name="action">
+					<option selected value="buy">Buy</option>
+					<option value="sell">Sell</option>
+				</select>
+				BTC Amount <input [(ngModel)]="btcAmount" type="number" step="any" class="form-control" style="margin:4px" name="amount" placeholder="Amount of BTC" required="" autofocus="" style="width: 150px"/>
+				Fee Percentage <input [(ngModel)]="feeValue" type="number" step="any" class="form-control" style="margin:4px" name="fee" placeholder="Enter a fee" required="" autofocus="" step="0.01" min="0" max="99" style="width: 150px"/>
+				<br>
+				<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit">Preview Trade</button>
+			</div>
+		</form>
+	</div>
+	<div class="modal-body" *ngIf="showConfirmTrade" style="text-align: center">
+		<h3>Transaction Value: ${{ btcAmount * btcPrice | number : '1.2-2' }}</h3>
+		<h3>Fee: ${{ finalFeeVal | number : '1.2-2' }}</h3>
+		<h3>Are you sure you want to {{ action }} {{ btcAmount }} BTC at a rate of ${{ btcPrice | number : '1.2-2' }}?</h3>
+		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit" (click)="confirmTrade()">Execute Trade</button>
+		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit" (click)="cancel()">Cancel</button>
+	</div>
+</div>

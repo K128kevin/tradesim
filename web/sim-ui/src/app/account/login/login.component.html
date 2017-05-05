@@ -1,0 +1,9 @@
+<div class="wrapper container">
+	<form class="form-signin" (ngSubmit)="login()">
+		<h2 class="form-signin-heading">Please login</h2>
+		<h3 *ngIf="errorMessage !== ''" class="error-message">{{ errorMessage }}</h3>
+		<input [(ngModel)]="username" type="text" class="form-control" style="margin:4px" name="username" placeholder="Email Address" required="" autofocus="" />
+		<input [(ngModel)]="password" type="password" class="form-control" style="margin:4px" name="password" placeholder="Password" required=""/>
+		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" type="submit">Login</button>   
+	</form>
+</div>

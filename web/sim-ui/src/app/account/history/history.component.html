@@ -1,0 +1,11 @@
+<div class="wrapper container">
+	<div class="form-signin" style="text-align: center; max-width: 800px;">       
+		<h2 class="form-signin-heading">Transaction History</h2>
+		<div class="transaction" *ngFor="let transaction of transactions">
+			<p>{{ transaction.Time | date:'MM/dd/yyyy h:mm:sss a Z' }}</p>
+			<p>{{ transaction.Action }} {{ transaction.Quantity }} {{ transaction.Symbol }} for ${{ transaction.Quantity * transaction.Rate | number : '1.2-2' }}</p>
+			<p>Rate: ${{ transaction.Rate | number : '1.2-2' }}</p>
+			<p>Fee: ${{ transaction.Fee | number : '1.2-2'  }}</p>
+		</div> 
+	</div>
+</div>

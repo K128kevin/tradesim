@@ -1,0 +1,11 @@
+<div class="wrapper container">
+	<form class="form-signin" (ngSubmit)="signup()">
+		<h3 *ngIf="errorMessage !== ''" class="error-message">{{ errorMessage }}</h3>
+		<h2 class="form-signin-heading">Create a New User</h2>
+		<input [(ngModel)]="email" type="text" class="form-control" style="margin:4px" name="email" placeholder="Email Address" required autofocus="" pattern="^[a-zA-Z0-9]+[a-z0-9A-Z._-]*@[a-z0-9A-Z._-]+\.[a-zA-Z._-]{2,20}$" title="Please enter a valid email address"/>
+		<input [(ngModel)]="username" type="text" class="form-control" style="margin:4px" name="username" placeholder="Username" required autofocus="" />
+		<input [(ngModel)]="password2" type="password" class="form-control" style="margin:4px" name="password" placeholder="Password" required/>
+		<input [(ngModel)]="password1" type="password" class="form-control" style="margin:4px" name="password" placeholder="Re-enter password" required/>
+		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" type="submit">Create User</button>   
+	</form>
+</div>

@@ -1,0 +1,11 @@
+<div class="wrapper container">
+	<div class="form-signin" style="text-align: center;">       
+		<h2 class="form-signin-heading">Profile</h2>
+		<h3>Change Password</h3>
+		<h3 *ngIf="errorMessage !== ''" class="error-message">{{ errorMessage }}</h3>
+		<input [(ngModel)]="password" type="password" class="form-control" style="margin:4px" name="password" placeholder="Enter current password" required=""/>
+		<input [(ngModel)]="newPassword1" type="password" class="form-control" style="margin:4px" name="password" placeholder="Enter new password" required=""/>
+		<input [(ngModel)]="newPassword2" type="password" class="form-control" style="margin:4px" name="password" placeholder="Re-enter new password" required=""/>
+		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" type="submit" (click)="changePassword()">Change Password</button>   
+	</div>
+</div>
