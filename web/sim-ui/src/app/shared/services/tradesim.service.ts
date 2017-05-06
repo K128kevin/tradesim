@@ -10,6 +10,7 @@ const BALANCE_URL = "api/tradesim/balance";
 const TRADE_URL = "api/tradesim/transactions/";
 const RESET_BALANCE_URL = "api/tradesim/balance/reset";
 const GET_TRANSACTIONS_URL = "api/tradesim/transactions";
+const VERIFY_EMAIL_URL = "api/verifyEmail/";
 const BTC_RATE_URL = "http://api.coindesk.com/v1/bpi/currentprice.json";
 
 @Injectable()
@@ -58,6 +59,10 @@ export class TradeSimService {
 
 	public resetBalance() {
 		return this._http.post(RESET_BALANCE_URL, {}, this._options);
+	}
+
+	public verifyEmail(token: string) {
+		return this._http.get(VERIFY_EMAIL_URL + token);
 	}
 
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 	"strconv"
 	"fmt"
+	"net/url"
 )
 
 func PingHandler(c *gin.Context) {
@@ -193,12 +194,18 @@ func ResetBalance(c *gin.Context) {
 
 func VerifyEmail(c *gin.Context) {
 	username := services.DecodeToken(c.Param("token"))
-	err := services.UpdateUserLastLogin(username)
+	unencoded, err := url.PathUnescape(username)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error":true,"message":err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":"Invalid link"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"error":false,"message":"User has been successfully verified!"})
+		err = services.UpdateUserLastLogin(unencoded)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error":true,"message":err.Error()})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"error":false,"message":"User has been successfully verified!"})
+		}
 	}
+	
 }
 
 

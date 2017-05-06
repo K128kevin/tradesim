@@ -10,7 +10,7 @@ import (
 )
 
 var encryptionKey = "g4WLBBlAgMJgZkmH13szM3OenpMuPw2S"
-var commonIV = []byte("FaOmz3fR3Rjeo1UeAUNDhd5ou1lmhDCD")
+var commonIV = []byte("FaOmz3fR3Rjeo1Ue")
 
 func HashString(input string) string {
 	hasher := md5.New()
@@ -29,10 +29,13 @@ func CreateToken(input string) string {
 	fmt.Printf("\nEncrypting: %s=>%x", []byte(input), ciphertext)
 
 	sEnc := b64.StdEncoding.EncodeToString(ciphertext)
+	fmt.Printf("\nFinal token: %s", sEnc)
 	return sEnc
 }
 
 func DecodeToken(input string) string {
+
+	fmt.Printf("\nInput: %s", input)
 
 	sDec, _ := b64.StdEncoding.DecodeString(input)
 	c, err := aes.NewCipher([]byte(encryptionKey))
@@ -42,7 +45,7 @@ func DecodeToken(input string) string {
 	cfbdec := cipher.NewCFBDecrypter(c, commonIV)
 	decryptedToken := make([]byte, len(sDec))
 	cfbdec.XORKeyStream(decryptedToken, []byte(sDec))
-	fmt.Printf("Decrypting: %x=>%s", sDec, decryptedToken)
+	fmt.Printf("\nDecrypting: %x=>%s", sDec, decryptedToken)
 	return string(decryptedToken)
 
 }

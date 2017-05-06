@@ -7,6 +7,7 @@ import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { HistoryComponent } from './account/history/history.component';
 import { ProfileComponent } from './account/profile/profile.component';
+import { VerifyComponent } from './account/verify/verify.component';
 
 const routes: Routes = [
 	{
@@ -43,6 +44,11 @@ const routes: Routes = [
 		path: 'contact',
 		pathMatch: 'full',
 		component: ContactComponent
+	},
+	{
+		path: 'verify/:token',
+		pathMatch: 'full',
+		component: VerifyComponent
 	}
 ]
 

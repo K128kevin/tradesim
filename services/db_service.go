@@ -138,7 +138,9 @@ func UpdateUserLastLogin(username string) error {
 		if updated != 1 || err != nil || err2 != nil {
 			return fmt.Errorf("User not found")
 		}
+		return nil
 	}
+	panic(err)
 }
 
 // Trade simulator functions
