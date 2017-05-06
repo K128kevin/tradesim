@@ -10,7 +10,7 @@ export class TradeComponent implements OnInit {
 
 	public modal: any;
 	public btcAmount: number;
-	public feeValue: number = 0.2;
+	public feeValue: number = 0.5;
 	public finalFeeVal: number;
 	public action: string = "buy";
 	public showConfirmTrade: boolean = false;

@@ -11,7 +11,7 @@ import (
 
 var db *sql.DB
 var InitialBalance = map[string]interface{} {
-	"USD": 10000.00,
+	"USD": 50000.00,
 	"BTC": 0.0,
 }
 

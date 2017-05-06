@@ -78,7 +78,7 @@ export class NavBarComponent {
 	}
 
 	resetBalance() {
-		let r = confirm("Are you sure you want to reset your account balance to $10,000?");
+		let r = confirm("Are you sure you want to reset your account balance to $50,000?");
 		if (r === true) {
 			this.tradeSimService.resetBalance()
 			.subscribe((res: any) => {
