@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"time"
+	"os"
 )
 
 var db *sql.DB
@@ -16,7 +17,7 @@ var InitialBalance = map[string]interface{} {
 }
 
 func Initialize() {
-	tempdb, err := sql.Open("postgres", "postgres://financedb:financedb@10.32.0.4/financedb")
+	tempdb, err := sql.Open("postgres", "postgres://financedb:financedb@" + os.Getenv("POSTGRES_HOST") + "/financedb")
 	if err != nil {
 		panic(err)
 	}
