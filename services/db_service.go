@@ -108,13 +108,7 @@ func CheckEmailVerified(username string) bool {
 	return true
 }
 
-
-
 func Login(login model.Login) (string, error) {
-	fmt.Println("Checking if email is verified")
-	if !CheckEmailVerified(login.Username) {
-		return "", fmt.Errorf("This account's email has not been verified. Please check your email for a verification link.")
-	}
 	pwHash := HashString(login.Password)
 	var exists bool
 	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 AND password_hash = $2)", login.Username, pwHash).Scan(&exists)
@@ -123,6 +117,10 @@ func Login(login model.Login) (string, error) {
 	}
 	if !exists {
 		return "", fmt.Errorf("Failed to validate username and password combination")
+	}
+	fmt.Println("Checking if email is verified")
+	if !CheckEmailVerified(login.Username) {
+		return "", fmt.Errorf("This account's email has not been verified. Please check your email for a verification link.")
 	}
 	err = UpdateUserLastLogin(login.Username)
 	if err != nil {

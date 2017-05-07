@@ -6,6 +6,7 @@ import (
 	"github.com/tradesim/services"
 	"net/http"
 	"time"
+	"strings"
 	"strconv"
 	"fmt"
 	"net/url"
@@ -18,6 +19,8 @@ func PingHandler(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user model.NewUser
 	if c.BindJSON(&user) == nil {
+		user.Username = strings.ToLower(user.Username)
+		user.Email = strings.ToLower(user.Email)
 		if services.UserExists(user.Username) {
 			c.JSON(http.StatusConflict, gin.H{"error":true,"message":"Username already used"})
 		} else if services.EmailExists(user.Email) {
@@ -58,6 +61,7 @@ func UpdatePassword(c *gin.Context) {
 func Login(c *gin.Context) {
 	var login model.Login
 	if c.BindJSON(&login) == nil {
+		login.Username = strings.ToLower(login.Username)
 		message, err := services.Login(login)
 		if err != nil {
 			c.JSON(http.StatusForbidden, gin.H{"error":true,"message":err.Error()})

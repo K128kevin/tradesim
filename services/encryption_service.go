@@ -6,11 +6,12 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"fmt"
+	"os"
 	b64 "encoding/base64"
 )
 
-var encryptionKey = "g4WLBBlAgMJgZkmH13szM3OenpMuPw2S"
-var commonIV = []byte("FaOmz3fR3Rjeo1Ue")
+var encryptionKey = os.Getenv("ENCRYPTION_KEY")
+var commonIV = []byte(os.Getenv("COMMON_IV"))
 
 func HashString(input string) string {
 	hasher := md5.New()
