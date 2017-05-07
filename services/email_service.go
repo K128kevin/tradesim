@@ -15,7 +15,7 @@ func SendAccountVerificationEmail(username string, email string) {
 	fmt.Printf("\nEncoded username: %s", encoded)
 	body := "<p><h3>Thank you for joining signing up with BTCPredictions! To verify your account and get started using the simulator, please click the link below.</h3></p><br><br><h4>http://localhost:4200/verify/" + encoded + "</h4>"
 	from := mail.NewEmail("BTCPredictions", "NoReply@BTCPredictions.com")
-	subject := "Successfully reset password!"
+	subject := "Please Verify BTCPredictions Account"
 	to := mail.NewEmail(username, email)
 	content := mail.NewContent("text/html", body)
 	m := mail.NewV3MailInit(from, subject, to, content)
