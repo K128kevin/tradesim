@@ -146,7 +146,7 @@ func UpdateUserLastLogin(username string) error {
 
 func GetBalance(user string) map[string]interface{} {
 	var balByte []byte
-	err := db.QueryRow("SELECT balances FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $1) AND balance_datetime = (SELECT MAX(balance_datetime) FROM balances)", user).Scan(&balByte)
+	err := db.QueryRow("SELECT balances FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $1) AND balance_datetime = (SELECT MAX(balance_datetime) FROM balances where user_id = (SELECT user_id FROM users WHERE username = $2))", user, user).Scan(&balByte)
 	if err != nil {
 		panic(err)
 	}
