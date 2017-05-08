@@ -33,3 +33,27 @@ func GetBitcoinPriceUSD(symbol string) float64 {
 	}
 	return retVal
 }
+
+func GetStockPriceUSD(symbol string) (float64, error) {
+	url := "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=" + symbol
+	response, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	respBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(respBody))
+	var data map[string]interface{}
+	err = json.Unmarshal(respBody, &data)
+	if err != nil {
+		panic(err)
+	}
+	price := data["LastPrice"]
+	if price == nil || price.(float64) == 0.0 {
+		return 0.0, fmt.Errorf("Provided symbol (" + symbol + ") is not available")
+	}
+	fmt.Printf("\n%d", price.(float64))
+	return price.(float64), nil
+}

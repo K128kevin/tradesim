@@ -115,27 +115,31 @@ func Buy(c *gin.Context) {
 		username := GetUsernameFromContext(c)
 		var balances map[string]interface{}
 		balances = services.GetBalance(username)
-		rate := GetRate(transaction.Symbol)
-		if balances["USD"].(float64) < (rate * transaction.Quantity) + transaction.Fee {
-			message := fmt.Sprintf("Insufficient funds (requires %f)", (transaction.Quantity * rate) + transaction.Fee)
-			c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
+		rate, err := GetRate(transaction.Symbol)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":err.Error()})
 		} else {
-			balances["USD"] = balances["USD"].(float64) - ((rate * transaction.Quantity) + transaction.Fee)
-			if balances[transaction.Symbol] == nil {
-				balances[transaction.Symbol] = transaction.Quantity
+			if balances["USD"].(float64) < (rate * transaction.Quantity) + transaction.Fee {
+				message := fmt.Sprintf("Insufficient funds (requires %f)", (transaction.Quantity * rate) + transaction.Fee)
+				c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
 			} else {
-				balances[transaction.Symbol] = balances[transaction.Symbol].(float64) + transaction.Quantity
-			}
-			err := services.UpdateBalance(username, balances)
-			if err != nil {
-				panic(err)
-			} else {
-				message := fmt.Sprintf("Traded %f USD for %f %s at a rate of %f with a transaction total cost of %f", (transaction.Quantity * rate), transaction.Quantity, transaction.Symbol, rate, transaction.Fee)
-				err = services.AddTransaction(username, transaction.Symbol, "BUY", transaction.Quantity, rate, transaction.Fee)
+				balances["USD"] = balances["USD"].(float64) - ((rate * transaction.Quantity) + transaction.Fee)
+				if balances[transaction.Symbol] == nil {
+					balances[transaction.Symbol] = transaction.Quantity
+				} else {
+					balances[transaction.Symbol] = balances[transaction.Symbol].(float64) + transaction.Quantity
+				}
+				err := services.UpdateBalance(username, balances)
 				if err != nil {
 					panic(err)
+				} else {
+					message := fmt.Sprintf("Traded %f USD for %f %s at a rate of %f with a transaction total cost of %f", (transaction.Quantity * rate), transaction.Quantity, transaction.Symbol, rate, transaction.Fee)
+					err = services.AddTransaction(username, transaction.Symbol, "BUY", transaction.Quantity, rate, transaction.Fee)
+					if err != nil {
+						panic(err)
+					}
+					c.JSON(http.StatusOK, gin.H{"error":false,"message": message})
 				}
-				c.JSON(http.StatusOK, gin.H{"error":false,"message": message})
 			}
 		}
 	}
@@ -147,33 +151,38 @@ func Sell(c *gin.Context) {
 		username := GetUsernameFromContext(c)
 		var balances map[string]interface{}
 		balances = services.GetBalance(username)
-		rate := GetRate(transaction.Symbol)
-		if balances[transaction.Symbol].(float64) < transaction.Quantity {
-			message := fmt.Sprintf("Cannot sell %f %s because you only have %f", transaction.Quantity, transaction.Symbol, balances[transaction.Symbol])
-			c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
+		rate, err := GetRate(transaction.Symbol)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":err.Error()})
 		} else {
-			balances[transaction.Symbol] = balances[transaction.Symbol].(float64) - transaction.Quantity
-			balances["USD"] = balances["USD"].(float64) + ((transaction.Quantity * rate) - transaction.Fee)
-			err := services.UpdateBalance(username, balances)
-			if err != nil {
-				panic(err)
+			if balances[transaction.Symbol].(float64) < transaction.Quantity {
+				message := fmt.Sprintf("Cannot sell %f %s because you only have %f", transaction.Quantity, transaction.Symbol, balances[transaction.Symbol])
+				c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
 			} else {
-				message := fmt.Sprintf("Traded %f %s for %f USD at a rate of %f with a transaction total cost of %f", transaction.Quantity, transaction.Symbol, (transaction.Quantity * rate), rate, transaction.Fee)
-				err = services.AddTransaction(username, transaction.Symbol, "SELL", transaction.Quantity, rate, transaction.Fee)
+				balances[transaction.Symbol] = balances[transaction.Symbol].(float64) - transaction.Quantity
+				balances["USD"] = balances["USD"].(float64) + ((transaction.Quantity * rate) - transaction.Fee)
+				err := services.UpdateBalance(username, balances)
 				if err != nil {
 					panic(err)
+				} else {
+					message := fmt.Sprintf("Traded %f %s for %f USD at a rate of %f with a transaction total cost of %f", transaction.Quantity, transaction.Symbol, (transaction.Quantity * rate), rate, transaction.Fee)
+					err = services.AddTransaction(username, transaction.Symbol, "SELL", transaction.Quantity, rate, transaction.Fee)
+					if err != nil {
+						panic(err)
+					}
+					c.JSON(http.StatusOK, gin.H{"error":false,"message":message})
 				}
-				c.JSON(http.StatusOK, gin.H{"error":false,"message":message})
 			}
 		}
 	}
 }
 
-func GetRate(symbol string) float64 {
+func GetRate(symbol string) (float64, error) {
 	if (symbol == "BTC") {
-		return services.GetBitcoinPriceUSD(symbol)
+		return services.GetBitcoinPriceUSD(symbol), nil
+	} else {
+		return services.GetStockPriceUSD(symbol)
 	}
-	return 1.5
 }
 
 func GetBTCPrice(c *gin.Context) {
