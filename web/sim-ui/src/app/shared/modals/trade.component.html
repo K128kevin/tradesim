@@ -10,7 +10,7 @@
 					<option selected value="buy">Buy</option>
 					<option value="sell">Sell</option>
 				</select>
-				BTC Amount <input [(ngModel)]="btcAmount" type="number" step="any" class="form-control" style="margin:4px" name="amount" placeholder="Amount of BTC" required="" autofocus="" style="width: 150px"/>
+				BTC Amount <input [(ngModel)]="btcAmount" min="0" type="number" step="any" class="form-control" style="width: 150px; margin:4px" name="amount" placeholder="Amount of BTC" required="" autofocus=""/>
 				Fee Percentage <input [(ngModel)]="feeValue" type="number" step="any" class="form-control" style="margin:4px" name="fee" placeholder="Enter a fee" required="" autofocus="" step="0.01" min="0" max="99" style="width: 150px"/>
 				<br>
 				<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit">Preview Trade</button>
