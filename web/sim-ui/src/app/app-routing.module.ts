@@ -8,6 +8,7 @@ import { ContactComponent } from './contact/contact.component';
 import { HistoryComponent } from './account/history/history.component';
 import { ProfileComponent } from './account/profile/profile.component';
 import { VerifyComponent } from './account/verify/verify.component';
+import { ResetComponent } from './account/reset/reset.password.component';
 
 const routes: Routes = [
 	{
@@ -49,6 +50,11 @@ const routes: Routes = [
 		path: 'verify/:token',
 		pathMatch: 'full',
 		component: VerifyComponent
+	},
+	{
+		path: 'resetPassword/:token',
+		pathMatch: 'full',
+		component: ResetComponent
 	}
 ]
 

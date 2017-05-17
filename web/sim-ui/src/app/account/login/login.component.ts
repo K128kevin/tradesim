@@ -12,6 +12,8 @@ export class LoginComponent {
 	public username: string;
 	public password: string;
 	public errorMessage: string;
+	public resetPassword: boolean = false;
+	public resetUser: string;
 
 	constructor(private tradeSimService: TradeSimService, private router: Router, private route: ActivatedRoute) {}
 
@@ -37,5 +39,29 @@ export class LoginComponent {
 			console.log(errObj);
 			this.errorMessage = errObj.message;
 		});
+	}
+
+	sendResetPasswordLink() {
+		this.tradeSimService.resetPasswordEmail(this.resetUser)
+		.subscribe((res: any) => {
+			let response = res.json();
+			console.log(response);
+			if (res.status == 200) {
+				alert("Please check your email for instructions to reset your password.");
+				this.toggleView();
+			}
+		}, (error: any) => {
+			let obj = JSON.parse(error._body);
+			console.log(error._body);
+			this.errorMessage = "Failed to send reset password email - " + obj.message;
+		});
+	}
+
+	toggleView() {
+		this.resetPassword = !this.resetPassword;
+		this.errorMessage = "";
+		this.username = "";
+		this.password = "";
+		this.resetUser = "";
 	}
 }

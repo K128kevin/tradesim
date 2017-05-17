@@ -9,6 +9,6 @@ export class AboutComponent {
 	constructor() {}
 
 	ngOnInit() {
-		console.log("Initializing about component!");
+		console.log("Initializing about component...");
 	}
 }

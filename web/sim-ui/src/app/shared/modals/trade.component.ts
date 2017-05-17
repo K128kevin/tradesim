@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TradeSimService } from '../services/tradesim.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
 	selector: 'trade',
@@ -16,10 +17,17 @@ export class TradeComponent implements OnInit {
 	public showConfirmTrade: boolean = false;
 	public btcPrice: number;
 
+	public AssetName: string;
+	public AssetPrice: number = 0.0;
+	public AssetSymbol: string;
+	public AssetChange: number = 0.0;
+
+
+
 	constructor(private tradeSimService: TradeSimService) {}
 
 	ngOnInit() {
-		console.log("Initializing trade component!");
+		console.log("Initializing trade component...");
 	}
 
 	showModal(modal: any) {
@@ -68,6 +76,27 @@ export class TradeComponent implements OnInit {
 	cancel() {
 		this.showConfirmTrade = false;
 		this.modal.hide();
+	}
+
+	updateSymbol() {
+		this.tradeSimService.getStockPrice(this.AssetSymbol)
+		.subscribe((res: any) => {
+			let response = res.json();
+			console.log(response);
+			if (res.status == 200) {
+				// Name, LastPrice, ChangePercent
+				let respData = JSON.parse(res._body);
+				this.AssetName = respData.Name;
+				this.AssetChange = respData.ChangePercent
+				this.AssetPrice = respData.LastPrice
+			}
+		}, (error: any) => {
+			console.log("Failed to get current rate for symbol " + this.AssetSymbol);
+			console.log(JSON.parse(error._body));
+			this.AssetName = "Cannot find symbol " + this.AssetSymbol;
+			this.AssetChange = 0.0;
+			this.AssetPrice = 0.0;
+		});
 	}
 
 }

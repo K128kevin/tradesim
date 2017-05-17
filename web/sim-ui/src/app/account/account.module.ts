@@ -8,6 +8,7 @@ import { SignupComponent } 					from './signup/signup.component';
 import { HistoryComponent } 				from './history/history.component';
 import { ProfileComponent } 				from './profile/profile.component';
 import { VerifyComponent } 					from './verify/verify.component';
+import { ResetComponent } 					from './reset/reset.password.component';
 
 @NgModule({
 
@@ -22,7 +23,8 @@ import { VerifyComponent } 					from './verify/verify.component';
 		SignupComponent,
 		HistoryComponent,
 		ProfileComponent,
-		VerifyComponent
+		VerifyComponent,
+		ResetComponent
 	]
 
 })
