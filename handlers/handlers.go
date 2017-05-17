@@ -10,7 +10,10 @@ import (
 	"strconv"
 	"fmt"
 	"net/url"
+	"sync"
 )
+
+var mutex = &sync.Mutex{}
 
 func PingHandler(c *gin.Context) {
 	c.Writer.Write([]byte("Pong\n"))
@@ -35,14 +38,15 @@ func CreateUser(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{"error":false})
 			}
 		}
-		
 	}
-	
 }
 
 func GetMe(c *gin.Context) {
 	var user model.User
-	user = services.GetUserByUsername(GetUsernameFromContext(c))
+	user, err := services.GetUserByUsername(GetUsernameFromContext(c))
+	if err != nil {
+		panic(err)
+	}
 	c.JSON(http.StatusOK, gin.H{"Username":user.Username,"Email":user.Email});
 }
 
@@ -217,6 +221,48 @@ func VerifyEmail(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusOK, gin.H{"error":false,"message":"User has been successfully verified!"})
 		}
+	}
+	
+}
+
+func GetAssetPrice(c *gin.Context) {
+	mutex.Lock()
+	time.Sleep(time.Millisecond * 750) // 0.3 seconds between requests
+	symbol := c.Param("symbol")
+	c.JSON(http.StatusOK, services.GetStockResponse(symbol))
+	mutex.Unlock()
+}
+
+func SendResetPasswordEmail(c *gin.Context) {
+	username := c.Param("username")
+	fmt.Println("Attempting to send reset password email for user " + username)
+	user, err := services.GetUserByUsername(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error":true,"message":"Username not found"})
+	} else {
+		services.SendResetPasswordLink(username, user.Email, services.CreateToken(username))
+		c.JSON(http.StatusOK, gin.H{"error":false,"message":"Please check your email for instructions to reset your password."})
+	}
+}
+
+func ResetPassword(c *gin.Context) {
+	username := services.DecodeToken(c.Param("token"))
+	fmt.Printf("\n\nAttempting to reset password for user %s\n", username)
+	// get user's email
+	user, err := services.GetUserByUsername(username)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":"Token not found"});
+	} else {
+		// generate random password
+		newPass := services.RandomPassword()
+		// update password in db
+		err := services.UpdatePasswordForce(newPass, username)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":err.Error()})
+		}
+		// send email with new password
+		services.SendNewPasswordEmail(username, user.Email, newPass)
+		c.JSON(http.StatusOK, gin.H{"error":false,"message":"Password has been sucessfully reset"})
 	}
 	
 }

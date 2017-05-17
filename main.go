@@ -13,6 +13,8 @@ func main() {
 
     router.GET("/ping", handlers.PingHandler)
     router.GET("/api/verifyEmail/:token", handlers.VerifyEmail)
+    router.GET("/api/resetPassword/:token", handlers.ResetPassword)
+    router.GET("/api/sendResetPasswordEmail/:username", handlers.SendResetPasswordEmail)
 
 	/////////////////////
     // User Management //
@@ -47,6 +49,7 @@ func main() {
 	    v1.POST("/transactions/buy", handlers.Buy)
 	    v1.POST("/transactions/sell", handlers.Sell)
 	    v1.POST("/balance/reset", handlers.ResetBalance)
+        v1.GET("/rate/:symbol", handlers.GetAssetPrice)
     }
 
     router.Run()

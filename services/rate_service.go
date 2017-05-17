@@ -57,3 +57,27 @@ func GetStockPriceUSD(symbol string) (float64, error) {
 	fmt.Printf("\n%d", price.(float64))
 	return price.(float64), nil
 }
+
+func GetStockResponse(symbol string) map[string]interface{} {
+	url := "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=" + symbol
+	response, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	respBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(respBody))
+	var data map[string]interface{}
+	err = json.Unmarshal(respBody, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+
+
+
+

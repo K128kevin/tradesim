@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"time"
 	"os"
+	"strings"
 )
 
 var db *sql.DB
@@ -27,13 +28,10 @@ func Initialize() {
 
 // User functions
 
-func GetUserByUsername(username string) model.User {
+func GetUserByUsername(username string) (model.User, error) {
 	var user model.User
-	err := db.QueryRow("SELECT user_id, username, email FROM users WHERE username = $1", username).Scan(&user.Id, &user.Username, &user.Email)
-	if err != nil {
-		panic(err)
-	}
-	return user
+	err := db.QueryRow("SELECT user_id, username, email FROM users WHERE username = $1", strings.ToLower(username)).Scan(&user.Id, &user.Username, &user.Email)
+	return user, err
 }
 
 func GetUserByEmail(email string) model.User {
@@ -47,7 +45,7 @@ func GetUserByEmail(email string) model.User {
 
 func UserExists(username string) bool {
 	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = $1", username).Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = $1", strings.ToLower(username)).Scan(&count)
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +76,7 @@ func AddUser(email string, username string, password string) error {
 func UpdatePassword(update model.UpdatePassword, username string) error {
 	newHash := HashString(update.NewPassword)
 	oldHash := HashString(update.OldPassword)
-	result, err := db.Exec("UPDATE users SET password_hash = $1 WHERE username = $2 AND password_hash = $3", newHash, username, oldHash)
+	result, err := db.Exec("UPDATE users SET password_hash = $1 WHERE username = $2 AND password_hash = $3", newHash, strings.ToLower(username), oldHash)
 	if result != nil {
 		updated, _ := result.RowsAffected()
 		if updated != 1 {
@@ -88,8 +86,20 @@ func UpdatePassword(update model.UpdatePassword, username string) error {
 	return err
 }
 
+func UpdatePasswordForce(newPass string, username string) error {
+	newHash := HashString(newPass)
+	result, err := db.Exec("UPDATE users SET password_hash = $1 WHERE username = $2", newHash, strings.ToLower(username))
+	if result != nil {
+		updated, _ := result.RowsAffected()
+		if updated != 1 {
+			return fmt.Errorf("Provided username not found")
+		}
+	}
+	return err
+}
+
 func CheckEmailVerified(username string) bool {
-	rows, _ := db.Query("SELECT last_login FROM users WHERE username = $1", username)
+	rows, _ := db.Query("SELECT last_login FROM users WHERE username = $1", strings.ToLower(username))
 	var last_login time.Time
 	count := 0
 	for rows.Next() {
@@ -131,7 +141,7 @@ func Login(login model.Login) (string, error) {
 }
 
 func UpdateUserLastLogin(username string) error {
-	result, err := db.Exec("UPDATE users SET last_login = current_timestamp WHERE username = $1", username)
+	result, err := db.Exec("UPDATE users SET last_login = current_timestamp WHERE username = $1", strings.ToLower(username))
 	if result != nil {
 		updated, err2 := result.RowsAffected()
 		if updated != 1 || err != nil || err2 != nil {
@@ -146,6 +156,7 @@ func UpdateUserLastLogin(username string) error {
 
 func GetBalance(user string) map[string]interface{} {
 	var balByte []byte
+	user = strings.ToLower(user)
 	err := db.QueryRow("SELECT balances FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $1) AND balance_datetime = (SELECT MAX(balance_datetime) FROM balances where user_id = (SELECT user_id FROM users WHERE username = $2))", user, user).Scan(&balByte)
 	if err != nil {
 		panic(err)
@@ -160,23 +171,23 @@ func GetBalance(user string) map[string]interface{} {
 
 func UpdateBalance(user string, newBalances map[string]interface{}) error {
 	balString, _ := json.Marshal(newBalances)
-	_, err := db.Exec("INSERT INTO balances (user_id, balances) VALUES((SELECT user_id FROM users WHERE username = $1), $2)", user, balString)
+	_, err := db.Exec("INSERT INTO balances (user_id, balances) VALUES((SELECT user_id FROM users WHERE username = $1), $2)", strings.ToLower(user), balString)
 	return err
 }
 
 func AddTransaction(username string, symbol string, tradetype string, quantity float64, rate float64, fee float64) error {
-	_, err := db.Exec("INSERT INTO transactions (user_id, symbol, tradetype, quantity, rate, fee_amount) VALUES((SELECT user_id FROM users WHERE username = $1), $2, $3, $4, $5, $6)", username, symbol, tradetype, quantity, rate, fee)
+	_, err := db.Exec("INSERT INTO transactions (user_id, symbol, tradetype, quantity, rate, fee_amount) VALUES((SELECT user_id FROM users WHERE username = $1), $2, $3, $4, $5, $6)", strings.ToLower(username), symbol, tradetype, quantity, rate, fee)
 	return err
 }
 
 func ResetBalance(username string) error {
-	err := UpdateBalance(username, InitialBalance)
+	err := UpdateBalance(strings.ToLower(username), InitialBalance)
 	return err
 }
 
 func GetTransactions(user string) []model.TransactionDetail {
 	transactions := make([]model.TransactionDetail, 0)
-	rows, err := db.Query("SELECT occurred_at, tradetype, quantity, symbol, rate, fee_amount from transactions where user_id = (select user_id from users where username = $1);", user)
+	rows, err := db.Query("SELECT occurred_at, tradetype, quantity, symbol, rate, fee_amount from transactions where user_id = (select user_id from users where username = $1);", strings.ToLower(user))
 	if err != nil {
 		panic(err)
 	}

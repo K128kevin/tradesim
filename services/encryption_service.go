@@ -7,11 +7,14 @@ import (
 	"crypto/cipher"
 	"fmt"
 	"os"
-	b64 "encoding/base64"
+	b32 "encoding/base32"
+	"math/rand"
 )
 
 var encryptionKey = os.Getenv("ENCRYPTION_KEY")
 var commonIV = []byte(os.Getenv("COMMON_IV"))
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
 func HashString(input string) string {
 	hasher := md5.New()
@@ -29,7 +32,7 @@ func CreateToken(input string) string {
 	cfb.XORKeyStream(ciphertext, []byte(input))
 	fmt.Printf("\nEncrypting: %s=>%x", []byte(input), ciphertext)
 
-	sEnc := b64.StdEncoding.EncodeToString(ciphertext)
+	sEnc := b32.StdEncoding.EncodeToString(ciphertext)
 	fmt.Printf("\nFinal token: %s", sEnc)
 	return sEnc
 }
@@ -38,7 +41,7 @@ func DecodeToken(input string) string {
 
 	fmt.Printf("\nInput: %s", input)
 
-	sDec, _ := b64.StdEncoding.DecodeString(input)
+	sDec, _ := b32.StdEncoding.DecodeString(input)
 	c, err := aes.NewCipher([]byte(encryptionKey))
 	if err != nil {
 		panic(err)
@@ -49,6 +52,18 @@ func DecodeToken(input string) string {
 	fmt.Printf("\nDecrypting: %x=>%s", sDec, decryptedToken)
 	return string(decryptedToken)
 
+}
+
+func RandomPassword() string {
+	return RandStringBytes(10)
+}
+
+func RandStringBytes(n int) string {
+    b := make([]byte, n)
+    for i := range b {
+        b[i] = letterBytes[rand.Intn(len(letterBytes))]
+    }
+    return string(b)
 }
 
 
