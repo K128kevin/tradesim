@@ -161,11 +161,10 @@ func UpdateRates(symbols []string) {
 	if len(symbols) == 0 {
 		return
 	}
+	CurrentRates["BTC"] = GetBitcoinRate()[0]
 	rates := RetrieveRates(symbols)
 	for _, rate := range rates {
-		if rate.Symbol == "BTC" {
-			CurrentRates[rate.Symbol] = GetBitcoinRate()[0]
-		} else if rate.Symbol == "USD" {
+		if rate.Symbol == "USD" {
 			var usd model.Rate
 			usd.Name = "United States Dollar"
 			usd.Price = 1.0

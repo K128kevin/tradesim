@@ -364,8 +364,6 @@ func GetAllUserBalances(c *gin.Context) {
 		for symbol, quantity := range balances {
 			if symbol == "USD" {
 				tempVal += quantity.(float64)
-			} else if symbol == "BTC" {
-				tempVal += services.GetBitcoinPriceUSD() * quantity.(float64)
 			} else {
 				tempVal += (services.CurrentRates[symbol].Price * quantity.(float64))
 			}
