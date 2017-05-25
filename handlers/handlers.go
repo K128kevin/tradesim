@@ -335,21 +335,27 @@ func GetAllUserBalances(c *gin.Context) {
 	var values map[string]float64 // username => account value in usd
 	values = make(map[string]float64)
 	users = services.GetAllUsers()
-	var missingSymbols []string
-	missingSymbols = make([]string, 0)
+	missingSymbols := make(map[string]bool)
 
 	// calculate balance for rates we have already found
 	for _, user := range users {
 		balances := services.GetBalance(user.Username)
 		for symbol, _ := range balances {
 			if _, ok := services.CurrentRates[symbol]; !ok {
-			    missingSymbols = append(missingSymbols, symbol)
+			    missingSymbols[symbol] = true
 			}
 		}
 	}
 
+	var missArray []string
+	for key, _ := range missingSymbols {
+		if key != "BTC" && key != "USD" {
+			missArray = append(missArray, key)
+		}
+	}
+
 	// get rates we haven't found
-	services.UpdateRates(missingSymbols)
+	services.UpdateRates(missArray)
 
 	// calculate balance including rates we hadn't previously found
 	for _, user := range users {
