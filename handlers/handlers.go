@@ -300,31 +300,32 @@ func GetAccountValueByUsername(username string) float64 {
 	totalValue = 0.0
 
 	// get all symbols besides USD and BTC
-	missingSymbols := make([]string, 0)
+	missingSymbols := make(map[string]bool)
 	for symbol, _ := range balance {
 		if symbol != "BTC" && symbol != "USD" {
 			if _, ok := services.CurrentRates[symbol]; !ok {
-			    missingSymbols = append(missingSymbols, symbol)
+			    missingSymbols[symbol] = true
 			}
 		}
 	}
 
+	var missArray []string
+	for key, _ := range missingSymbols {
+		if key != "BTC" && key != "USD" {
+			missArray = append(missArray, key)
+		}
+	}
+
 	// update  rates
-	services.UpdateRates(missingSymbols)
+	services.UpdateRates(missArray)
 
 	// call stock api for those symbols
 	for symbol, quantity := range balance {
-		totalValue += services.CurrentRates[symbol].Price * quantity.(float64)
-	}
-
-	// add usd val
-	if val, ok := balance["USD"]; ok {
-		totalValue += val.(float64)
-	}
-
-	// add btc val
-	if val, ok := balance["BTC"]; ok {
-		totalValue += val.(float64) * services.GetBitcoinPriceUSD()
+		if symbol == "USD" {
+			totalValue += quantity.(float64)
+		} else {
+			totalValue += services.CurrentRates[symbol].Price * quantity.(float64)
+		}
 	}
 
 	return totalValue
