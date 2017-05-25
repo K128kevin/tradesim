@@ -25,7 +25,8 @@ func main() {
     	v2.POST("", handlers.CreateUser)
 	    v2.POST("/login", handlers.Login)
 	    v2.POST("/logout", handlers.Logout)
-
+        v2.GET("/value/:username", handlers.GetAccountValue)
+        v2.GET("value", handlers.GetAllUserBalances)
 	    v2.POST("/verifyCookie", handlers.VerifyCookie)
     }
     
@@ -50,6 +51,7 @@ func main() {
 	    v1.POST("/transactions/sell", handlers.Sell)
 	    v1.POST("/balance/reset", handlers.ResetBalance)
         v1.GET("/rate/:symbol", handlers.GetAssetPrice)
+        v1.GET("/accountValue", handlers.GetMyValue)
     }
 
     router.Run()

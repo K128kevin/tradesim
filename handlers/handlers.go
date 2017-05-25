@@ -10,10 +10,7 @@ import (
 	"strconv"
 	"fmt"
 	"net/url"
-	"sync"
 )
-
-var mutex = &sync.Mutex{}
 
 func PingHandler(c *gin.Context) {
 	c.Writer.Write([]byte("Pong\n"))
@@ -119,31 +116,28 @@ func Buy(c *gin.Context) {
 		username := GetUsernameFromContext(c)
 		var balances map[string]interface{}
 		balances = services.GetBalance(username)
-		rate, err := GetRate(transaction.Symbol)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":err.Error()})
+		rateObj := GetRate(transaction.Symbol)
+		rate := rateObj.Ask
+		if balances["USD"].(float64) < (rate * transaction.Quantity) + transaction.Fee {
+			message := fmt.Sprintf("Insufficient funds (requires %f)", (transaction.Quantity * rate) + transaction.Fee)
+			c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
 		} else {
-			if balances["USD"].(float64) < (rate * transaction.Quantity) + transaction.Fee {
-				message := fmt.Sprintf("Insufficient funds (requires %f)", (transaction.Quantity * rate) + transaction.Fee)
-				c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
+			balances["USD"] = balances["USD"].(float64) - ((rate * transaction.Quantity) + transaction.Fee)
+			if balances[transaction.Symbol] == nil {
+				balances[transaction.Symbol] = transaction.Quantity
 			} else {
-				balances["USD"] = balances["USD"].(float64) - ((rate * transaction.Quantity) + transaction.Fee)
-				if balances[transaction.Symbol] == nil {
-					balances[transaction.Symbol] = transaction.Quantity
-				} else {
-					balances[transaction.Symbol] = balances[transaction.Symbol].(float64) + transaction.Quantity
-				}
-				err := services.UpdateBalance(username, balances)
+				balances[transaction.Symbol] = balances[transaction.Symbol].(float64) + transaction.Quantity
+			}
+			err := services.UpdateBalance(username, balances)
+			if err != nil {
+				panic(err)
+			} else {
+				message := fmt.Sprintf("Traded %f USD for %f %s at a rate of %f with a transaction total cost of %f", (transaction.Quantity * rate), transaction.Quantity, transaction.Symbol, rate, transaction.Fee)
+				err = services.AddTransaction(username, transaction.Symbol, "BUY", transaction.Quantity, rate, transaction.Fee)
 				if err != nil {
 					panic(err)
-				} else {
-					message := fmt.Sprintf("Traded %f USD for %f %s at a rate of %f with a transaction total cost of %f", (transaction.Quantity * rate), transaction.Quantity, transaction.Symbol, rate, transaction.Fee)
-					err = services.AddTransaction(username, transaction.Symbol, "BUY", transaction.Quantity, rate, transaction.Fee)
-					if err != nil {
-						panic(err)
-					}
-					c.JSON(http.StatusOK, gin.H{"error":false,"message": message})
 				}
+				c.JSON(http.StatusOK, gin.H{"error":false,"message": message})
 			}
 		}
 	}
@@ -155,42 +149,47 @@ func Sell(c *gin.Context) {
 		username := GetUsernameFromContext(c)
 		var balances map[string]interface{}
 		balances = services.GetBalance(username)
-		rate, err := GetRate(transaction.Symbol)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":err.Error()})
+		if _, ok := balances[transaction.Symbol]; !ok {
+			balances[transaction.Symbol] = 0.0
+		}
+		rateObj := GetRate(transaction.Symbol)
+		rate := rateObj.Bid
+		if balances[transaction.Symbol].(float64) < transaction.Quantity {
+			message := fmt.Sprintf("Cannot sell %f %s because you only have %f", transaction.Quantity, transaction.Symbol, balances[transaction.Symbol])
+			c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
 		} else {
-			if balances[transaction.Symbol].(float64) < transaction.Quantity {
-				message := fmt.Sprintf("Cannot sell %f %s because you only have %f", transaction.Quantity, transaction.Symbol, balances[transaction.Symbol])
-				c.JSON(http.StatusForbidden, gin.H{"error":true,"message": message})
+			balances[transaction.Symbol] = balances[transaction.Symbol].(float64) - transaction.Quantity
+			balances["USD"] = balances["USD"].(float64) + ((transaction.Quantity * rate) - transaction.Fee)
+			err := services.UpdateBalance(username, balances)
+			if err != nil {
+				panic(err)
 			} else {
-				balances[transaction.Symbol] = balances[transaction.Symbol].(float64) - transaction.Quantity
-				balances["USD"] = balances["USD"].(float64) + ((transaction.Quantity * rate) - transaction.Fee)
-				err := services.UpdateBalance(username, balances)
+				message := fmt.Sprintf("Traded %f %s for %f USD at a rate of %f with a transaction total cost of %f", transaction.Quantity, transaction.Symbol, (transaction.Quantity * rate), rate, transaction.Fee)
+				err = services.AddTransaction(username, transaction.Symbol, "SELL", transaction.Quantity, rate, transaction.Fee)
 				if err != nil {
 					panic(err)
-				} else {
-					message := fmt.Sprintf("Traded %f %s for %f USD at a rate of %f with a transaction total cost of %f", transaction.Quantity, transaction.Symbol, (transaction.Quantity * rate), rate, transaction.Fee)
-					err = services.AddTransaction(username, transaction.Symbol, "SELL", transaction.Quantity, rate, transaction.Fee)
-					if err != nil {
-						panic(err)
-					}
-					c.JSON(http.StatusOK, gin.H{"error":false,"message":message})
 				}
+				c.JSON(http.StatusOK, gin.H{"error":false,"message":message})
 			}
 		}
 	}
 }
 
-func GetRate(symbol string) (float64, error) {
+func GetRate(symbol string) model.Rate { // TODO: Handle case where symbol does not exist, or is USD
+	if rate, ok := services.CurrentRates[symbol]; ok {
+		return rate
+	}
 	if (symbol == "BTC") {
-		return services.GetBitcoinPriceUSD(symbol), nil
+		return services.GetBitcoinRate()[0]
 	} else {
-		return services.GetStockPriceUSD(symbol)
+		symbolArr := make([]string, 0)
+		symbolArr = append(symbolArr, symbol)
+		return services.RetrieveRates(symbolArr)[0]
 	}
 }
 
 func GetBTCPrice(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"price":services.GetBitcoinPriceUSD("BTC")})
+	c.JSON(http.StatusOK, gin.H{"price":services.GetBitcoinPriceUSD()})
 }
 
 func GetUsernameFromContext(c *gin.Context) string {
@@ -226,11 +225,27 @@ func VerifyEmail(c *gin.Context) {
 }
 
 func GetAssetPrice(c *gin.Context) {
-	mutex.Lock()
-	time.Sleep(time.Millisecond * 750) // 0.3 seconds between requests
 	symbol := c.Param("symbol")
-	c.JSON(http.StatusOK, services.GetStockResponse(symbol))
-	mutex.Unlock()
+	fmt.Printf("\nGetting rate object for symbol %s", symbol)
+	var rate model.Rate
+	if val, ok := services.CurrentRates[symbol]; ok {
+		rate = val
+	} else {
+		if (strings.ToUpper(symbol) == "BTC") {
+			rate = services.GetBitcoinRate()[0]
+		} else {
+			symbolArr := make([]string, 0)
+			symbolArr = append(symbolArr, symbol)
+			rates := services.RetrieveRates(symbolArr)
+			if len(rates) == 0 {
+				c.JSON(http.StatusNotFound, gin.H{"error":true,"message":"Sybol not found"})
+			} else {
+				rate = rates[0]
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, rate)
 }
 
 func SendResetPasswordEmail(c *gin.Context) {
@@ -264,7 +279,88 @@ func ResetPassword(c *gin.Context) {
 		services.SendNewPasswordEmail(username, user.Email, newPass)
 		c.JSON(http.StatusOK, gin.H{"error":false,"message":"Password has been sucessfully reset"})
 	}
-	
+}
+
+// Account Value Handlers
+
+func GetMyValue(c *gin.Context) {
+	val := GetAccountValueByUsername(GetUsernameFromContext(c))
+	c.JSON(http.StatusOK, gin.H{"AccountValueUSD":val})
+}
+
+func GetAccountValue(c *gin.Context) {
+	username := c.Param("username")
+	totalValue := GetAccountValueByUsername(username)
+	c.JSON(http.StatusOK, gin.H{"AccountValueUSD":totalValue})
+}
+
+func GetAccountValueByUsername(username string) float64 {
+	balance := services.GetBalance(username)
+	var totalValue float64
+	totalValue = 0.0
+
+	// get all symbols besides USD and BTC
+	missingSymbols := make([]string, 0)
+	for symbol, _ := range balance {
+		if symbol != "BTC" && symbol != "USD" {
+			if _, ok := services.CurrentRates[symbol]; !ok {
+			    missingSymbols = append(missingSymbols, symbol)
+			}
+		}
+	}
+
+	// update  rates
+	services.UpdateRates(missingSymbols)
+
+	// call stock api for those symbols
+	for symbol, quantity := range balance {
+		totalValue += services.CurrentRates[symbol].Price * quantity.(float64)
+	}
+
+	// add usd val
+	if val, ok := balance["USD"]; ok {
+		totalValue += val.(float64)
+	}
+
+	// add btc val
+	if val, ok := balance["BTC"]; ok {
+		totalValue += val.(float64) * services.GetBitcoinPriceUSD()
+	}
+
+	return totalValue
+}
+
+func GetAllUserBalances(c *gin.Context) {
+	var users []model.User
+	var values map[string]float64 // username => account value in usd
+	values = make(map[string]float64)
+	users = services.GetAllUsers()
+	var missingSymbols []string
+	missingSymbols = make([]string, 0)
+
+	// calculate balance for rates we have already found
+	for _, user := range users {
+		balances := services.GetBalance(user.Username)
+		for symbol, _ := range balances {
+			if _, ok := services.CurrentRates[symbol]; !ok {
+			    missingSymbols = append(missingSymbols, symbol)
+			}
+		}
+	}
+
+	// get rates we haven't found
+	services.UpdateRates(missingSymbols)
+
+	// calculate balance including rates we hadn't previously found
+	for _, user := range users {
+		var tempVal float64
+		balances := services.GetBalance(user.Username)
+		for symbol, quantity := range balances {
+			tempVal += (services.CurrentRates[symbol].Price * quantity.(float64))
+		}
+		values[user.Username] = tempVal
+	}
+	c.JSON(http.StatusOK, values)
 }
 
 

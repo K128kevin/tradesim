@@ -14,3 +14,12 @@ type TransactionDetail struct {
 	Rate 			float64 `form:"Rate" json:"Rate" binding:"required"`
 	Time 			string `form:"Time" json"Time" binding:"required"`
 }
+
+type Rate struct {
+	Symbol 			string `json:"symbol" binding:"required"`
+	Name 			string `json:"description" binding:"required"`
+	Price 			float64 `json:"last" binding:"required"`
+	Change 			float64 `json:"change" binding:"required"`
+	Bid 			float64 `json:"bid" binding:"required"`
+	Ask 			float64 `json:"ask" binding:"required"`
+}

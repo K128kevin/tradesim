@@ -23,10 +23,25 @@ func Initialize() {
 		panic(err)
 	}
 	db = tempdb
+	InitRates()
 	InitializeSessions()
 }
 
 // User functions
+
+func GetAllUsers() []model.User {
+	var users []model.User
+	rows, _ := db.Query("SELECT username FROM users")
+	for rows.Next() {
+		var temp model.User
+		err := rows.Scan(&temp.Username)
+		if err != nil {
+			panic(err)
+		}
+		users = append(users, temp)
+	}
+	return users
+}
 
 func GetUserByUsername(username string) (model.User, error) {
 	var user model.User
@@ -170,6 +185,11 @@ func GetBalance(user string) map[string]interface{} {
 }
 
 func UpdateBalance(user string, newBalances map[string]interface{}) error {
+	for symbol, quantity := range newBalances {
+		if quantity.(float64) == 0 {
+			delete(newBalances, symbol)
+		}
+	}
 	balString, _ := json.Marshal(newBalances)
 	_, err := db.Exec("INSERT INTO balances (user_id, balances) VALUES((SELECT user_id FROM users WHERE username = $1), $2)", strings.ToLower(user), balString)
 	return err
