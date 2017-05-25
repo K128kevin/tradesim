@@ -1,0 +1,15 @@
+<div class="wrapper container general-container" style="text-align: center;">
+	<h2>Leader Board</h2>
+	<table class="table" style="text-align: left;">
+		<tr>
+			<th>Rank</th>
+			<th>Username</th>
+			<th>Account Value</th>
+		</tr>
+		<tr *ngFor="let user of Users">
+			<td>{{ user.Rank }}</td>
+			<td>{{ user.Username }}</td>
+			<td>${{ user.Value | number : '1.2-2' }}</td>
+		</tr>
+	</table>
+</div>

@@ -4,11 +4,13 @@ import { LandingComponent } from './landing/landing.component';
 import { LoginComponent } from './account/login/login.component';
 import { SignupComponent } from './account/signup/signup.component';
 import { AboutComponent } from './about/about.component';
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { ContactComponent } from './contact/contact.component';
 import { HistoryComponent } from './account/history/history.component';
 import { ProfileComponent } from './account/profile/profile.component';
 import { VerifyComponent } from './account/verify/verify.component';
 import { ResetComponent } from './account/reset/reset.password.component';
+import { HoldingsComponent } from './account/holdings/holdings.component';
 
 const routes: Routes = [
 	{
@@ -55,6 +57,16 @@ const routes: Routes = [
 		path: 'resetPassword/:token',
 		pathMatch: 'full',
 		component: ResetComponent
+	},
+	{
+		path: 'positions',
+		pathMatch: 'full',
+		component: HoldingsComponent
+	},
+	{
+		path: 'leaderboard',
+		pathMatch: 'full',
+		component: LeaderboardComponent
 	}
 ]
 

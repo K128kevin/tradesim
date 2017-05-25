@@ -1,11 +1,21 @@
-<div class="wrapper container">
-	<div class="form-signin" style="text-align: center; max-width: 800px;">       
-		<h2 class="form-signin-heading">Transaction History</h2>
-		<div class="transaction" *ngFor="let transaction of transactions">
-			<p>{{ transaction.Time | date:'MM/dd/yyyy h:mm:sss a Z' }}</p>
-			<p>{{ transaction.Action }} {{ transaction.Quantity }} {{ transaction.Symbol }} for ${{ transaction.Quantity * transaction.Rate | number : '1.2-2' }}</p>
-			<p>Rate: ${{ transaction.Rate | number : '1.2-2' }}</p>
-			<p>Fee: ${{ transaction.Fee | number : '1.2-2'  }}</p>
-		</div> 
-	</div>
+<div class="wrapper container general-container" style="text-align: center;">
+	<h2>Transaction History</h2>
+	<table class="table" style="text-align: left;">
+		<tr>
+			<th>Date</th>
+			<th>Action</th>
+			<th>Symbol</th>
+			<th>Quantity</th>
+			<th>Rate</th>
+			<th>Fee</th>
+		</tr>
+		<tr *ngFor="let t of transactions">
+			<td>{{ t.Time | date:'MM/dd/yyyy h:mm:sss a Z' }}</td>
+			<td>{{ t.Action }}</td>
+			<td>{{ t.Symbol }}</td>
+			<td>{{ t.Quantity | number : '1.2-2' }}</td>
+			<td>${{ t.Rate | number : '1.2-2' }}</td>
+			<td>${{ t.Fee | number : '1.2-2' }}</td>
+		</tr>
+	</table>
 </div>

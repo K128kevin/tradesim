@@ -1,0 +1,28 @@
+<div class="wrapper container general-container" style="text-align: center;">
+	<h2>Positions</h2>
+	<table class="table" style="text-align: left;">
+		<tr>
+			<th>Name</th>
+			<th>Symbol</th>
+			<th>Quantity</th>
+			<th>Current Rate</th>
+			<th>Position Value</th>
+		</tr>
+		<tr *ngFor="let bk of balanceKeys">
+			<td>{{ balances[bk].Name }}</td>
+			<td>{{ bk }}</td>
+			<td>{{ balances[bk].Quantity | number : '1.0-0' }}</td>
+			<td>${{ balances[bk].Price | number : '1.2-2' }}</td>
+			<td>${{ balances[bk].Price * balances[bk].Quantity | number : '1.2-2' }}</td>
+		</tr>
+		<tfoot>
+			<tr>
+				<th>Total Value</th>
+				<td></td>
+				<td></td>
+				<td></td>
+				<th>${{ totalValue | number : '1.2-2' }}</th>
+			</tr>
+		</tfoot>
+	</table>
+</div>

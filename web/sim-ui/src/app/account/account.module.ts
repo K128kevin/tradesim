@@ -9,6 +9,7 @@ import { HistoryComponent } 				from './history/history.component';
 import { ProfileComponent } 				from './profile/profile.component';
 import { VerifyComponent } 					from './verify/verify.component';
 import { ResetComponent } 					from './reset/reset.password.component';
+import { HoldingsComponent } 				from './holdings/holdings.component';
 
 @NgModule({
 
@@ -24,7 +25,8 @@ import { ResetComponent } 					from './reset/reset.password.component';
 		HistoryComponent,
 		ProfileComponent,
 		VerifyComponent,
-		ResetComponent
+		ResetComponent,
+		HoldingsComponent
 	]
 
 })

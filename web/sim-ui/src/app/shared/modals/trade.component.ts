@@ -10,19 +10,23 @@ import { FormControl } from '@angular/forms';
 export class TradeComponent implements OnInit {
 
 	public modal: any;
-	public btcAmount: number;
-	public feeValue: number = 0.2;
-	public finalFeeVal: number;
+	public feeValue: number = 4.95;
 	public action: string = "buy";
-	public showConfirmTrade: boolean = false;
 	public btcPrice: number;
 
 	public AssetName: string;
+	public AssetAmount: number;
 	public AssetPrice: number = 0.0;
 	public AssetSymbol: string;
 	public AssetChange: number = 0.0;
+	public AssetAsk: number = 0.0;
+	public AssetBid: number = 0.0;
+	public AssetCost: number = 0.0;
+	public ChangePlusMinus: string = "+";
 
+	public errorMessage: string = "";
 
+	public page: number = 0;
 
 	constructor(private tradeSimService: TradeSimService) {}
 
@@ -35,28 +39,24 @@ export class TradeComponent implements OnInit {
 		modal.show();
 	}
 
+	lookupSymbol() {
+		this.page = 1;
+		this.AssetSymbol = this.AssetSymbol.toUpperCase();
+		this.updateSymbol();
+	}
+
 	executeTrade() {
-		let btcPrice: number;
-		this.tradeSimService.getCurrentBTCRate()
-		.subscribe((res: any) => {
-			let response = res.json();
-			console.log(response);
-			if (res.status == 200) {
-				let respData = JSON.parse(res._body);
-				this.btcPrice = parseFloat(respData.bpi.USD.rate.replace(/,/g, ""));
-				this.finalFeeVal = (this.feeValue * 0.01) * (this.btcAmount * this.btcPrice);
-				this.showConfirmTrade = true;
-			}
-		}, (error: any) => {
-			console.log("Failed to get current btc rate");
-			console.log(JSON.parse(error._body));
-			alert("Error getting btc rate - please try again. If this problem persists, please contact support at btcpredictions@gmail.com.");
-		});
+		this.page = 2;
+		if (this.action === "Sell") {
+			this.AssetCost = this.AssetBid;
+		} else {
+			this.AssetCost = this.AssetAsk;
+		}
 	}
 
 	confirmTrade() {
 		this.modal.hide();
-		this.tradeSimService.tradeBTC(this.action, {"Symbol":"BTC","Quantity":this.btcAmount,"Fee":this.finalFeeVal})
+		this.tradeSimService.tradeBTC(this.action, {"Symbol":this.AssetSymbol,"Quantity":this.AssetAmount,"Fee":this.feeValue})
 		.subscribe((res: any) => {
 			let response = res.json();
 			console.log(response);
@@ -70,25 +70,33 @@ export class TradeComponent implements OnInit {
 			console.log(err);
 			alert(err.message);
 		});
-		this.showConfirmTrade = false;
+		this.page = 0;
 	}
 
 	cancel() {
-		this.showConfirmTrade = false;
+		this.page = 0;
 		this.modal.hide();
+		this.AssetName = "";
+		this.AssetSymbol = "";
+		this.AssetChange = 0;
+		this.ChangePlusMinus = "";
+		this.AssetAmount = 0;
 	}
 
 	updateSymbol() {
-		this.tradeSimService.getStockPrice(this.AssetSymbol)
+		this.tradeSimService.getAssetPrice(this.AssetSymbol)
 		.subscribe((res: any) => {
 			let response = res.json();
 			console.log(response);
 			if (res.status == 200) {
 				// Name, LastPrice, ChangePercent
 				let respData = JSON.parse(res._body);
-				this.AssetName = respData.Name;
-				this.AssetChange = respData.ChangePercent
-				this.AssetPrice = respData.LastPrice
+				this.AssetName = respData.description;
+				this.AssetChange = respData.change
+				this.AssetPrice = respData.last
+				this.AssetAsk = respData.ask
+				this.AssetBid = respData.bid
+				this.ChangePlusMinus = this.AssetChange > 0 ? "+" : "-";
 			}
 		}, (error: any) => {
 			console.log("Failed to get current rate for symbol " + this.AssetSymbol);
@@ -97,6 +105,11 @@ export class TradeComponent implements OnInit {
 			this.AssetChange = 0.0;
 			this.AssetPrice = 0.0;
 		});
+		
+	}
+
+	GetColor() {
+		return this.ChangePlusMinus == "+" ? "green" : "red";
 	}
 
 }

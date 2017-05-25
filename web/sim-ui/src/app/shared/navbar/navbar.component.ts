@@ -28,7 +28,7 @@ export class NavBarComponent {
 
 	ngOnInit() {
 		console.log("Initializing navbar component!");
-		this.getBalance();
+		this.getAccountVal();
 		this.getBTCRate();
 		this.tradeSimService.getUserInfo()
 		.subscribe((res: any) => {
@@ -55,12 +55,25 @@ export class NavBarComponent {
 				if (res.status == 200) {
 					let respData = JSON.parse(res._body);
 					this.btcRate = parseFloat(respData.bpi.USD.rate.replace(/,/g, ""));
-					this.accountVal = (this.btcRate * this.balance.BTC) + this.balance.USD;
 				}
 			}, (error: any) => {
 				console.log("Failed to get current btc rate");
 				console.log(JSON.parse(error._body));
 			});
+	}
+
+	getAccountVal() {
+		this.tradeSimService.getMyAccountValue()
+		.subscribe((res: any) => {
+			let response = res.json();
+			console.log(response);
+			if (res.status == 200) {
+				this.accountVal = JSON.parse(res._body)["AccountValueUSD"];
+			}
+		}, (error: any) => {
+			console.log("Failed to get account value");
+			console.log(JSON.parse(error._body));
+		});
 	}
 
 	getBalance() {
@@ -115,6 +128,10 @@ export class NavBarComponent {
 
 	showTradeModal(tradeModal: any) {
 		this.tradeComponent.showModal(tradeModal);
+	}
+
+	onHidden() {
+		this.tradeComponent.cancel();
 	}
 
 }

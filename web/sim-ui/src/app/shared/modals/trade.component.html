@@ -2,7 +2,23 @@
 	<div class="modal-header" style="text-align: center">
 		<h3 class="modal-title">Make a Trade</h3>
 	</div>
-	<div class="modal-body" *ngIf="!showConfirmTrade">
+	<div class="modal-body" *ngIf="page == 0" style="text-align: center">
+		<h3>Symbol Lookup</h3>
+		<p>
+			Enter symbol of stock or currency you wish to trade
+		</p>
+		<form (ngSubmit)="lookupSymbol()">
+			<h3 *ngIf="errorMessage !== ''" class="error-message">{{ errorMessage }}</h3>
+			<input [(ngModel)]="AssetSymbol" type="text" class="form-control" style="margin:4px" name="symbol" placeholder="BTC, MSFT, AAPL, etc" required="" autofocus="" />
+			<button class="btn btn-lg btn-primary btn-block" style="margin:4px" type="submit">Lookup</button>
+		</form>
+	</div>
+	<div class="modal-body" *ngIf="page == 1" style="text-align: center">
+		<h3>{{ AssetName }}</h3>
+		<h3 [style.color]="GetColor()">${{ AssetPrice | number: '1.2-2' }}, {{ ChangePlusMinus }}{{ AssetChange | number: '1.2-2'}}%</h3>
+		<h3>
+			Bid: ${{ AssetBid | number: '1.2-2' }}<br>Ask: ${{ AssetAsk | number: '1.2-2' }}
+		</h3>
 		<form (ngSubmit)="executeTrade()" style="text-align: center">
 			<div style="display: inline-block">
 				Action
@@ -10,17 +26,17 @@
 					<option selected value="buy">Buy</option>
 					<option value="sell">Sell</option>
 				</select>
-				BTC Amount <input [(ngModel)]="btcAmount" min="0" type="number" step="any" class="form-control" style="width: 150px; margin:4px" name="amount" placeholder="Amount of BTC" required="" autofocus=""/>
-				Fee Percentage <input [(ngModel)]="feeValue" type="number" step="any" class="form-control" style="margin:4px" name="fee" placeholder="Enter a fee" required="" autofocus="" step="0.01" min="0" max="99" style="width: 150px"/>
+				{{ AssetSymbol }} Amount <input [(ngModel)]="AssetAmount" min="0" type="number" step="any" class="form-control" style="margin:4px" name="amount" placeholder="Amount of {{ AssetSymbol }}" required="" autofocus=""/>
+				Fee Amount <input [(ngModel)]="feeValue" type="number" step="any" class="form-control" style="margin:4px" name="fee" placeholder="Enter a fee" required="" autofocus="" step="0.01" min="4.95"/>
 				<br>
 				<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit">Preview Trade</button>
 			</div>
 		</form>
 	</div>
-	<div class="modal-body" *ngIf="showConfirmTrade" style="text-align: center">
-		<h3>Transaction Value: ${{ btcAmount * btcPrice | number : '1.2-2' }}</h3>
-		<h3>Fee: ${{ finalFeeVal | number : '1.2-2' }}</h3>
-		<h3>Are you sure you want to {{ action }} {{ btcAmount }} BTC at a rate of ${{ btcPrice | number : '1.2-2' }}?</h3>
+	<div class="modal-body" *ngIf="page == 2" style="text-align: center">
+		<h3>Transaction Value: ${{ AssetAmount * AssetPrice | number : '1.2-2' }}</h3>
+		<h3>Fee: ${{ feeValue | number : '1.2-2' }}</h3>
+		<h3>Are you sure you want to {{ action }} {{ AssetAmount }} {{ AssetSymbol }} at a rate of ${{ AssetCost | number : '1.2-2' }}?</h3>
 		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit" (click)="confirmTrade()">Execute Trade</button>
 		<button class="btn btn-lg btn-primary btn-block" style="margin:4px" text="submit" (click)="cancel()">Cancel</button>
 	</div>
