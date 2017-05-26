@@ -36,6 +36,7 @@ export class HoldingsComponent {
 				if (key === "USD") {
 					this.balances["USD"].Name = "United States Dollar";
 					this.balances["USD"].Price = 1.0;
+					this.totalValue += this.balances["USD"].Quantity
 				} else {
 					this.tradeSimService.getAssetPrice(key)
 					.subscribe((res: any) => {
