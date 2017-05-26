@@ -239,6 +239,7 @@ func GetAssetPrice(c *gin.Context) {
 			rates := services.RetrieveRates(symbolArr)
 			if len(rates) == 0 {
 				c.JSON(http.StatusNotFound, gin.H{"error":true,"message":"Sybol not found"})
+				return
 			} else {
 				rate = rates[0]
 			}
