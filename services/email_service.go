@@ -13,9 +13,9 @@ func SendAccountVerificationEmail(username string, email string) {
 	fmt.Printf("\nToken: %s", token)
 	encoded := url.QueryEscape(token)
 	fmt.Printf("\nEncoded username: %s", encoded)
-	body := "<p><h3>Thank you for joining signing up with BTCPredictions! To verify your account and get started using the simulator, please click the link below.</h3></p><br><br><h4>http://" + os.Getenv("TRADESIM_HOST") + "/verify/" + encoded + "</h4>"
-	from := mail.NewEmail("BTCPredictions", "NoReply@BTCPredictions.com")
-	subject := "Please Verify BTCPredictions Account"
+	body := "<p><h3>Thank you for joining signing up with DemoInvestor! To verify your account and get started using the simulator, please click the link below.</h3></p><br><br><h4>http://" + os.Getenv("TRADESIM_HOST") + "/verify/" + encoded + "</h4>"
+	from := mail.NewEmail("DemoInvestor", "NoReply@DemoInvestor.com")
+	subject := "Please Verify DemoInvestor Account"
 	to := mail.NewEmail(username, email)
 	content := mail.NewContent("text/html", body)
 	m := mail.NewV3MailInit(from, subject, to, content)
@@ -35,9 +35,9 @@ func SendAccountVerificationEmail(username string, email string) {
 }
 
 func SendNewPasswordEmail(username string, email string, newPassword string) {
-	body := "<p><h3>Your BTCPredictions password has been successfully reset. Your new password is:</h3></p><br><br><h4>" + newPassword + "</h4><br><br><p><h3>If you believe this is a mistake, please email me directly at BTCPredictions@gmailcom.</h3></p>"
-	from := mail.NewEmail("BTCPredictions", "NoReply@BTCPredictions.com")
-	subject := "Successfully Reset BTCPredictions Password!"
+	body := "<p><h3>Your DemoInvestor password has been successfully reset. Your new password is:</h3></p><br><br><h4>" + newPassword + "</h4><br><br><p><h3>If you believe this is a mistake, please email me directly at DemoInvestor@gmailcom.</h3></p>"
+	from := mail.NewEmail("DemoInvestor", "NoReply@DemoInvestor.com")
+	subject := "Successfully Reset DemoInvestor Password!"
 	to := mail.NewEmail(username, email)
 	content := mail.NewContent("text/html", body)
 	m := mail.NewV3MailInit(from, subject, to, content)
@@ -61,8 +61,8 @@ func SendResetPasswordLink(username string, email string, token string) {
 	encoded := url.QueryEscape(token)
 	fmt.Printf("\nEncoded username: %s", encoded)
 	link := "http://" + os.Getenv("TRADESIM_HOST") + "/resetPassword/" + encoded
-	body := "<p><h3>Please click the following link to reset your password: " + link + "<br><br>If you believe this is a mistake, please email me directly at BTCPredictions@gmailcom.</h3></p>"
-	from := mail.NewEmail("BTCPredictions", "NoReply@BTCPredictions.com")
+	body := "<p><h3>Please click the following link to reset your password: " + link + "<br><br>If you believe this is a mistake, please email me directly at DemoInvestor@gmailcom.</h3></p>"
+	from := mail.NewEmail("DemoInvestor", "NoReply@DemoInvestor.com")
 	subject := "Reset Password Request"
 	to := mail.NewEmail(username, email)
 	content := mail.NewContent("text/html", body)
