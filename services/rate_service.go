@@ -26,7 +26,7 @@ func InitRates() {
 
 func MaintainUpdatedRates() {
 	for {
-		time.Sleep(time.Second * 2)
+		time.Sleep(time.Second * 5)
 		symbols := make([]string, 0)
 		for symbol, _ := range CurrentRates {
 			symbols = append(symbols, symbol)
@@ -64,7 +64,7 @@ func GetBitcoinPriceUSD() float64 {
 		fmt.Println(string(respBody))
 		err := json.Unmarshal(respBody, &objmap)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		data = objmap["bpi"].(map[string]interface{})
 		usd = data["USD"].(map[string]interface{})
