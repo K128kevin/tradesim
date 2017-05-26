@@ -40,7 +40,6 @@ export class TradeComponent implements OnInit {
 	}
 
 	lookupSymbol() {
-		this.page = 1;
 		this.AssetSymbol = this.AssetSymbol.toUpperCase();
 		this.updateSymbol();
 	}
@@ -97,11 +96,12 @@ export class TradeComponent implements OnInit {
 				this.AssetAsk = respData.ask
 				this.AssetBid = respData.bid
 				this.ChangePlusMinus = this.AssetChange > 0 ? "+" : "-";
+				this.page = 1;
 			}
 		}, (error: any) => {
 			console.log("Failed to get current rate for symbol " + this.AssetSymbol);
 			console.log(JSON.parse(error._body));
-			this.AssetName = "Cannot find symbol " + this.AssetSymbol;
+			this.errorMessage = "Cannot find symbol " + this.AssetSymbol;
 			this.AssetChange = 0.0;
 			this.AssetPrice = 0.0;
 		});

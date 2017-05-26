@@ -95,16 +95,13 @@ func GetStockResponse(symbols []string) map[string]interface{} {
 
 func MakeStockRequest(symbols []string) *http.Response {
 	symbolsString := strings.Join(symbols, ",")
-	req, err := http.NewRequest("GET", stock_endpoint + symbolsString, nil)
+	req, _ := http.NewRequest("GET", stock_endpoint + symbolsString, nil)
 	req.Header.Add("Authorization", "Bearer " + os.Getenv("STOCK_API_TOKEN"))
 	req.Header.Add("Accept", "application/json")
 	Wait()
 	client := &http.Client{}
 	fmt.Printf("\nRequest Url: %s\n", req.URL)
-	response, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
+	response, _ := client.Do(req)
 	return response
 }
 
@@ -117,6 +114,13 @@ func Wait() {
 func RetrieveRates(symbols []string) []model.Rate {
 	var rates []model.Rate
 	rates = make([]model.Rate, 0)
+
+	defer func() {
+        // recover from panic if one occured. Set err to nil otherwise.
+        if (recover() != nil) {
+        	fmt.Println("ERROR CAUGHT RETRIEVING RATES!")
+        }
+    }()
 
 	stocks := GetStockResponse(symbols)
 	quotes := stocks["quotes"]
