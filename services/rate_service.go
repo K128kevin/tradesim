@@ -64,7 +64,8 @@ func GetBitcoinPriceUSD() float64 {
 		fmt.Println(string(respBody))
 		err := json.Unmarshal(respBody, &objmap)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("\nERROR GETTING BITCOIN PRICE\n")
+			return CurrentRates["BTC"].Price
 		}
 		data = objmap["bpi"].(map[string]interface{})
 		usd = data["USD"].(map[string]interface{})
