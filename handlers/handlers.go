@@ -375,6 +375,35 @@ func GetAllUserBalances(c *gin.Context) {
 	c.JSON(http.StatusOK, values)
 }
 
+// ARTICLES
+
+func GetArticle(c *gin.Context) {
+	var article model.Article
+	articleId := c.Param("articleid")
+	article = services.GetArticle(articleId)
+	if article.Title == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error":true,"message":"Article with provided id (" + articleId + ") could not be found"})
+	} else {
+		c.JSON(http.StatusOK, article)
+	}
+}
+
+func GetRecentArticles(c *gin.Context) {
+	var articles []model.Article
+	limit := c.Query("limit")
+	fmt.Println("Limit: " + limit)
+	if limit == "" {
+		limit = "0"
+	}
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error":true,"message":"invalid value provided for limit parameter"})
+	} else {
+		articles = services.GetArticles(limitInt)
+		c.JSON(http.StatusOK, articles)
+	}
+}
+
 
 
 

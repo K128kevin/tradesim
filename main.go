@@ -15,6 +15,8 @@ func main() {
     router.GET("/api/verifyEmail/:token", handlers.VerifyEmail)
     router.GET("/api/resetPassword/:token", handlers.ResetPassword)
     router.GET("/api/sendResetPasswordEmail/:username", handlers.SendResetPasswordEmail)
+    router.GET("api/articles/:articleid", handlers.GetArticle)
+    router.GET("api/articles", handlers.GetRecentArticles)
 
 	/////////////////////
     // User Management //

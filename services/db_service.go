@@ -9,6 +9,7 @@ import (
 	"time"
 	"os"
 	"strings"
+	"strconv"
 )
 
 var db *sql.DB
@@ -172,7 +173,7 @@ func UpdateUserLastLogin(username string) error {
 func GetBalance(user string) map[string]interface{} {
 	var balByte []byte
 	user = strings.ToLower(user)
-	err := db.QueryRow("SELECT balances FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $1) AND balance_datetime = (SELECT MAX(balance_datetime) FROM balances where user_id = (SELECT user_id FROM users WHERE username = $2))", user, user).Scan(&balByte)
+	err := db.QueryRow("SELECT balances FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $1) AND balance_datetime = (SELECT MAX(balance_datetime) FROM balances WHERE user_id = (SELECT user_id FROM users WHERE username = $2))", user, user).Scan(&balByte)
 	if err != nil {
 		panic(err)
 	}
@@ -207,7 +208,7 @@ func ResetBalance(username string) error {
 
 func GetTransactions(user string) []model.TransactionDetail {
 	transactions := make([]model.TransactionDetail, 0)
-	rows, err := db.Query("SELECT occurred_at, tradetype, quantity, symbol, rate, fee_amount from transactions where user_id = (select user_id from users where username = $1);", strings.ToLower(user))
+	rows, err := db.Query("SELECT occurred_at, tradetype, quantity, symbol, rate, fee_amount FROM transactions WHERE user_id = (select user_id FROM users WHERE username = $1);", strings.ToLower(user))
 	if err != nil {
 		panic(err)
 	}
@@ -217,6 +218,37 @@ func GetTransactions(user string) []model.TransactionDetail {
 		transactions = append(transactions, temp)
 	}
 	return transactions
+}
+
+func GetArticle(articleId string) model.Article {
+	var article model.Article
+	fmt.Println("Finding article with id " + articleId)
+	err := db.QueryRow("SELECT author, title, creation_time, content FROM articles WHERE article_id = $1", articleId).Scan(&article.Author, &article.Title, &article.CreatedDate, &article.Content)
+	if err != nil {
+		fmt.Println("Warning: Error selecting row from DB - " + err.Error())
+	}
+	fmt.Println("Article title: " + article.Title)
+	return article
+}
+
+func GetArticles(limit int) []model.Article {
+	var articles []model.Article
+	sql := "SELECT article_id, thumbnail_url, title, creation_time FROM articles ORDER BY creation_time DESC"
+	if limit > 0 {
+		sql +=  " LIMIT " + strconv.Itoa(limit)
+	}
+	rows, err := db.Query(sql)
+	if err != nil {
+		fmt.Println("Warning: Error selecting rows from DB - " + err.Error())
+	} else {
+		for rows.Next() {
+			var tempArticle model.Article
+			rows.Scan(&tempArticle.Id, &tempArticle.ThumbnailUrl, &tempArticle.Title, &tempArticle.CreatedDate)
+			articles = append(articles, tempArticle)
+		}
+	}
+	
+	return articles
 }
 
 
