@@ -11,6 +11,8 @@ import { ProfileComponent } from './account/profile/profile.component';
 import { VerifyComponent } from './account/verify/verify.component';
 import { ResetComponent } from './account/reset/reset.password.component';
 import { HoldingsComponent } from './account/holdings/holdings.component';
+import { ArticleComponent } from './articles/article.component';
+import { ArticleArchiveComponent } from './articles/article.archive.component';
 
 const routes: Routes = [
 	{
@@ -67,6 +69,16 @@ const routes: Routes = [
 		path: 'leaderboard',
 		pathMatch: 'full',
 		component: LeaderboardComponent
+	},
+	{
+		path: 'articles/:id',
+		pathMatch: 'full',
+		component: ArticleComponent
+	},
+	{
+		path: 'articles',
+		pathMatch: 'full',
+		component: ArticleArchiveComponent
 	}
 ]
 

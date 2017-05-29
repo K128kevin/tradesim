@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class LandingComponent {
 
 	public loggedIn: boolean = false;
+	public articles: any = [];
 
 	constructor(private tradeSimService: TradeSimService, private router: Router) {}
 
@@ -27,5 +28,18 @@ export class LandingComponent {
 			console.log(JSON.parse(error._body));
 			this.loggedIn = false;
 		});
+
+		this.tradeSimService.getArticles(5)
+		.subscribe((res: any) => {
+			let response = res.json();
+			console.log(response);
+			if (res.status == 200) {
+				this.articles = JSON.parse(res._body);
+			}
+		}, (error: any) => {
+			console.log("Failed to get recent articles");
+			console.log(JSON.parse(error._body));
+		});
+
 	}
 }

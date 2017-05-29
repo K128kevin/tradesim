@@ -16,6 +16,8 @@ const RESET_PASSWORD_EMAIL_URL = "api/sendResetPasswordEmail/";
 const STOCK_RATE_URL = "api/tradesim/rate/";
 const ALL_ACCOUNT_VALS_URL = "api/users/value";
 const MY_ACCOUNT_VAL_URL = "api/tradesim/accountValue";
+const ARTICLE_BY_ID_URL = "api/articles/";
+const ARTICLES_URL = "api/articles";
 const BTC_RATE_URL = "http://api.coindesk.com/v1/bpi/currentprice.json";
 
 @Injectable()
@@ -88,6 +90,14 @@ export class TradeSimService {
 
 	public getAccountValues() {
 		return this._http.get(ALL_ACCOUNT_VALS_URL);
+	}
+
+	public getArticleById(id: string) {
+		return this._http.get(ARTICLE_BY_ID_URL + id);
+	}
+
+	public getArticles(limit: number) {
+		return this._http.get(ARTICLES_URL + "?limit=" + limit);
 	}
 
 }

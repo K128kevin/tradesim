@@ -1,0 +1,11 @@
+<div class="wrapper container general-container" style="text-align: center;">
+	<div *ngIf="article.title !== ''">
+		<h2>{{ article.title }}</h2>
+		<h5> Date Published: {{ article.createdDate | date:'MM/dd/yyyy h:mm:sss a Z' }} </h5>
+		<h5> Author: {{ article.author }} </h5>
+		<div [innerHTML]="article.content"></div>
+	</div>
+	<div *ngIf="article.title === ''">
+		<h2>Article Not Found :(</h2>
+	</div>
+</div>

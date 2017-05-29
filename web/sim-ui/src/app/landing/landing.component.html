@@ -1,6 +1,7 @@
 <div style="text-align: center">
-	<div class="form-signin" style="max-width:70%">
+	<div class="general-container" style="max-width:70%">
 		<h2>Welcome to DemoInvestor Trade Simulator</h2>
+		<hr>
 		<h4><p>
 			Interested in investing or trading? Want to try out a new trading strategy but you're not ready to risk real money yet? Use this paper trading simulator to test out strategies and learn about market behavior without any of the financial risk! Financial markets can be crazy - use DemoInvestor to test the waters before jumping in.
 		</p></h4>
@@ -9,5 +10,20 @@
 			<h4>New user? <a routerLink="/signup">Sign up</a></h4>
 		</div>
 		<h4>Questions or comments about this project? Feel free to <a routerLink="/contact">contact</a> me any time!</h4>
+	</div>
+	<div class="general-container" style="max-width:70%;">
+		<h2>Recent Articles</h2>
+		<hr>
+		<h3 *ngFor="let article of articles" style="text-align: left;">
+			<div class="article-label">
+				<img routerLink="/articles/{{article.id}}" class="thumbnail" src="{{article.thumbnailUrl}}"/>
+				<div class="article-content">
+					<a routerLink="/articles/{{article.id}}">{{ article.title }}</a>
+					<h5>Posted {{ article.createdDate | date:'MM/dd/yyyy h:mm:sss a Z' }}</h5>
+				</div>
+			</div>
+		</h3>
+		<hr>
+		<h4><a routerLink="/articles">See All</a></h4>
 	</div>
 </div>
