@@ -1,5 +1,5 @@
-<div style="text-align: center">
-	<div class="general-container" style="max-width:70%">
+<div style="text-align: center; margin: 20px;">
+<!-- 	<div class="general-container" style="max-width:70%">
 		<h2>Welcome to DemoInvestor Trade Simulator</h2>
 		<hr>
 		<h4><p>
@@ -12,7 +12,7 @@
 		<h4>Questions or comments about this project? Feel free to <a routerLink="/contact">contact</a> me any time!</h4>
 	</div>
 	<div class="general-container" style="max-width:70%;">
-		<h2>Recent Articles</h2>
+		<h2>Recent Posts</h2>
 		<hr>
 		<h3 *ngFor="let article of articles" style="text-align: left;">
 			<div class="article-label">
@@ -25,5 +25,24 @@
 		</h3>
 		<hr>
 		<h4><a routerLink="/articles">See All</a></h4>
+	</div> -->
+	<div *ngIf="!loggedIn" class="intro-blurb">
+		<span class="home-text">Learn how to grow your money without risking it. Practice investing with our market simulator.</span>
+		<button class="btn-di" routerLink="/signup">Get Started</button>
+	</div>
+	<div class="article-preview">
+		<h2>Recent Posts</h2>
+		<hr>
+		<span *ngFor="let article of articles" style="text-align: left;">
+			<div class="article-label" routerLink="/articles/{{article.id}}">
+				<img class="thumbnail" src="{{article.thumbnailUrl}}"/>
+				<div class="article-content">
+					<a style="color: white; font-size: 22px;" routerLink="/articles/{{article.id}}">{{ article.title }}</a>
+					<h5>Posted {{ article.createdDate | date:'MM/dd/yyyy h:mm:sss a Z' }}</h5>
+				</div>
+			</div>
+		</span>
+		<hr>
+		<h4><a routerLink="/articles" style="color: white;">See All</a></h4>
 	</div>
 </div>
