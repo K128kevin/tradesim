@@ -10,13 +10,15 @@ import { ProfileComponent } 				from './profile/profile.component';
 import { VerifyComponent } 					from './verify/verify.component';
 import { ResetComponent } 					from './reset/reset.password.component';
 import { HoldingsComponent } 				from './holdings/holdings.component';
+import { AppRoutingModule } 				from '../app-routing.module';
 
 @NgModule({
 
 	imports: [
 		FormsModule,
 		HttpModule,
-    	BrowserModule
+    	BrowserModule,
+    	AppRoutingModule
 	],
 
 	declarations: [

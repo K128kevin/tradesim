@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { TradeSimService } from '../shared/services/tradesim.service';
 import { Router } from '@angular/router';
+import { TradeComponent } from '../shared/modals/trade.component';
 
 @Component({
 	selector: 'landing',
@@ -10,9 +11,12 @@ import { Router } from '@angular/router';
 export class LandingComponent {
 
 	public loggedIn: boolean = false;
+	public username: string;
 	public articles: any = [];
 
 	constructor(private tradeSimService: TradeSimService, private router: Router) {}
+
+	@ViewChild(TradeComponent) tradeComponent: TradeComponent;
 
 	ngOnInit() {
 		console.log("Initializing landing component!");
@@ -22,6 +26,7 @@ export class LandingComponent {
 			console.log(response);
 			if (res.status == 200) {
 				this.loggedIn = true;
+				this.username = JSON.parse(res._body)["Username"];
 			}
 		}, (error: any) => {
 			console.log("Failed to get user info");
@@ -42,4 +47,9 @@ export class LandingComponent {
 		});
 
 	}
+
+	showTradeModal(tradeModal: any) {
+		this.tradeComponent.showModal(tradeModal);
+	}
+
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { TradeSimService } from '../../shared/services/tradesim.service';
 
 @Component({
@@ -14,7 +15,7 @@ export class SignupComponent {
 	public password2: string;
 	public errorMessage: string = "";
 
-	constructor(private tradeSimService: TradeSimService) {}
+	constructor(private tradeSimService: TradeSimService, private router: Router) {}
 
 	ngOnInit() {
 		console.log("Initializing signup component!");
