@@ -8,3 +8,10 @@ type Article struct {
 	Author 			string `json:"author" binding:"required"`
 	Content 		string `json:"content" binding:"required"`
 }
+
+type Comment struct {
+	Id 				string `json:"id"`
+	Time 			string `json:"time"`
+	Content 		string `json:"content" binding:"required"`
+	Username 		string `json:"username"`
+}

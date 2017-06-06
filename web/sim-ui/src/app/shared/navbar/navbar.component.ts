@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { TradeSimService } from '../services/tradesim.service';
 import { Observable } from 'rxjs/Rx';
 import { TradeComponent } from '../modals/trade.component';
@@ -21,7 +21,10 @@ export class NavBarComponent {
 		Observable.interval(15000)
 		.subscribe((x) => {
 			this.getBTCRate();
-		})
+		});
+		this.router.events.subscribe((event: NavigationEnd) => {
+			this.getUserInfo();
+		});
 	}
 
 	@ViewChild(TradeComponent) tradeComponent: TradeComponent;
@@ -30,6 +33,10 @@ export class NavBarComponent {
 		console.log("Initializing navbar component!");
 		this.getAccountVal();
 		this.getBTCRate();
+		this.getUserInfo();
+	}
+
+	getUserInfo() {
 		this.tradeSimService.getUserInfo()
 		.subscribe((res: any) => {
 			let response = res.json();
@@ -38,12 +45,16 @@ export class NavBarComponent {
 				console.log("Got user info successfully");
 				this.user = JSON.parse(res._body);
 				this.loggedIn = true;
+				localStorage.setItem("username", this.user["Username"]);
+			} else {
+				localStorage.clear();
 			}
 		}, (error: any) => {
 			console.log("Failed to get user info");
 			console.log(JSON.parse(error._body));
 			this.loggedIn = false;
 			this.user = {};
+			localStorage.clear();
 		});
 	}
 
@@ -124,6 +135,7 @@ export class NavBarComponent {
 			console.log("Failed to log out - this is an unexpected error");
 			console.log(JSON.parse(error._body));
 		});
+		localStorage.clear();
 	}
 
 	showTradeModal(tradeModal: any) {

@@ -13,6 +13,22 @@ var duration int
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+func ManageCommentLimits() {
+	for {
+		var users []model.User
+		users = GetAllUsers()
+		for _, user := range users {
+			if _, ok := UserCommentLimits[user.Username]; !ok {
+				UserCommentLimits[user.Username] = 10
+			} else {
+				UserCommentLimits[user.Username] = min(UserCommentLimits[user.Username] + 1, 10)
+			}
+		}
+		time.Sleep(time.Minute * 10)
+	}
+	
+}
+
 func InitializeSessions() {
 	SessionStore = make(map[string]model.Session)
 	duration = int(20 * time.Minute) / int(time.Millisecond)

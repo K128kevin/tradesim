@@ -2,6 +2,6 @@
 	<h2>Articles</h2>
 	<h3 *ngFor="let article of articles">
 		<a routerLink="/articles/{{article.id}}">{{ article.title }}</a>
-		<h5>Posted {{ article.createdDate | date:'MM/dd/yyyy h:mm:sss a Z' }}</h5>
+		<h5>Posted {{ article.createdDate | date:'MM/dd/yyyy h:mm:ss a Z' }}</h5>
 	</h3>
 </div>

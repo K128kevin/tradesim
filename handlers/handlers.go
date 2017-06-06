@@ -404,6 +404,50 @@ func GetRecentArticles(c *gin.Context) {
 	}
 }
 
+// COMMENTS
+
+func GetCommentsForArticle(c *gin.Context) {
+	articleid := c.Param("articleid")
+	var comments []model.Comment
+	comments = services.GetCommentsForArticle(articleid)
+	if len(comments) < 1 {
+		c.JSON(http.StatusNotFound, comments)
+	} else {
+		c.JSON(http.StatusOK, comments)
+	}
+}
+
+func AddComment(c *gin.Context) {
+	var comment model.Comment
+	if c.BindJSON(&comment) == nil {
+		articleid := c.Param("articleid")
+		username := GetUsernameFromContext(c)
+		fmt.Printf("\nAdding comment for user %s on article with id %s", username, articleid)
+		fmt.Printf("\nArticle content: %s", comment.Content)
+		services.AddComment(articleid, username, comment.Content)
+		var comments []model.Comment
+		comments = services.GetCommentsForArticle(articleid)
+		c.JSON(http.StatusOK, comments)
+	}
+	
+}
+
+func UpdateComment(c *gin.Context) {
+	
+}
+
+func DeleteComment(c *gin.Context) {
+	commentid := c.Param("commentid")
+	username := GetUsernameFromContext(c)
+	fmt.Printf("\nDeleting comment with id %s belonging to user %s", commentid, username)
+	if username == "k128kevin" {
+		services.DeleteCommentForce(commentid)
+	} else {
+		services.DeleteComment(commentid, username)
+	}
+	c.JSON(http.StatusOK, gin.H{"error":false,"message":"Successfully deleted comment"})
+}
+
 
 
 

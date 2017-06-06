@@ -47,12 +47,27 @@
 <style>
 
 body {
-	/*background: #eee !important;*/
-	background: url(assets/images/leafbackground.jpg) no-repeat center center fixed; 
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
+  /*background: #eee !important;*/
+  background: url(assets/images/leafbackground.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+pre {
+  width: 100%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.delete-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.delete-icon:hover {
+  cursor: pointer;
 }
 
 .thumbnail {
@@ -99,6 +114,19 @@ body {
   color: white;
   background-color: #1da1db;
   padding: 20px 40px 20px 40px;
+  border-radius: 4px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.btn-di-small {
+  display: block;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 10px;
+  color: white;
+  background-color: #1da1db;
+  padding: 4px 8px 4px 8px;
   border-radius: 4px;
   text-align: center;
   border: 1px solid transparent;

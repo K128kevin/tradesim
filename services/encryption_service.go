@@ -66,6 +66,20 @@ func RandStringBytes(n int) string {
     return string(b)
 }
 
+func min(a int64, b int64) int64 {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+func max(a int64, b int64) int64 {
+    if a > b {
+        return a
+    }
+    return b
+}
+
 
 
 

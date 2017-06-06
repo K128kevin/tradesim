@@ -17,6 +17,7 @@ var InitialBalance = map[string]interface{} {
 	"USD": 50000.00,
 	"BTC": 0.0,
 }
+var UserCommentLimits map[string]int64
 
 func Initialize() {
 	tempdb, err := sql.Open("postgres", "postgres://financedb:financedb@" + os.Getenv("POSTGRES_HOST") + "/financedb")
@@ -26,6 +27,9 @@ func Initialize() {
 	db = tempdb
 	InitRates()
 	InitializeSessions()
+
+	UserCommentLimits = make(map[string]int64)
+	go ManageCommentLimits()
 }
 
 // User functions
@@ -249,6 +253,53 @@ func GetArticles(limit int) []model.Article {
 	}
 	
 	return articles
+}
+
+// COMMENTS
+
+func GetCommentsForArticle(articleid string) []model.Comment {
+	var comments []model.Comment
+	sql := "SELECT comment_time, username, comment_id, content FROM comments JOIN users ON comments.user_id = users.user_id WHERE comments.article_id = $1"
+	rows, err := db.Query(sql, articleid)
+	if err != nil {
+		fmt.Println("Warning: Error selecting rows from DB - " + err.Error())
+	} else {
+		for rows.Next() {
+			var tempComment model.Comment
+			rows.Scan(&tempComment.Time, &tempComment.Username, &tempComment.Id, &tempComment.Content)
+			comments = append(comments, tempComment)
+		}
+	}
+
+	return comments
+}
+
+func AddComment(articleid string, username string, content string) {
+	if _, ok := UserCommentLimits[username]; ok {
+		if (UserCommentLimits[username] > 0) {
+			UserCommentLimits[username] = max(UserCommentLimits[username] - 1, 0)
+			_, err := db.Exec("INSERT INTO comments (user_id, article_id, content) values((select user_id from users where username = $1), $2, $3)", username, articleid, content)
+			if err != nil {
+				fmt.Println("AddComment - Warning: Error inserting row into DB - " + err.Error())
+			}
+		} else {
+			fmt.Println("User " + username + " has reached comment limit")
+		}
+	}
+}
+
+func DeleteComment(commentid string, username string) {
+	_, err := db.Exec("DELETE FROM comments WHERE user_id = (select user_id from users where username = $1) AND comment_id = $2", username, commentid)
+	if err != nil {
+		fmt.Println("DeleteCOmment - Warning: Error deleting row from DB - " + err.Error())
+	}
+}
+
+func DeleteCommentForce(commentid string) {
+	_, err := db.Exec("DELETE FROM comments WHERE comment_id = $1", commentid)
+	if err != nil {
+		fmt.Println("DeleteCOmment - Warning: Error deleting row from DB - " + err.Error())
+	}
 }
 
 

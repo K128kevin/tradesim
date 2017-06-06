@@ -17,6 +17,7 @@ func main() {
     router.GET("/api/sendResetPasswordEmail/:username", handlers.SendResetPasswordEmail)
     router.GET("api/articles/:articleid", handlers.GetArticle)
     router.GET("api/articles", handlers.GetRecentArticles)
+    router.GET("api/articles/:articleid/comments", handlers.GetCommentsForArticle)
 
 	/////////////////////
     // User Management //
@@ -54,6 +55,18 @@ func main() {
 	    v1.POST("/balance/reset", handlers.ResetBalance)
         v1.GET("/rate/:symbol", handlers.GetAssetPrice)
         v1.GET("/accountValue", handlers.GetMyValue)
+    }
+
+    ///////////////////////
+    // Protected Content //
+    ///////////////////////
+
+    v4 := router.Group("/api/content")
+    v4.Use(handlers.VerifyCookieMW)
+    {
+        v4.POST("/comments/:articleid", handlers.AddComment)
+        v4.PUT("/comments/:commentid", handlers.UpdateComment)
+        v4.DELETE("/comments/:commentid", handlers.DeleteComment)
     }
 
     router.Run()

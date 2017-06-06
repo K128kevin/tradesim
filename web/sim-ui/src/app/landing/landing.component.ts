@@ -20,19 +20,13 @@ export class LandingComponent {
 
 	ngOnInit() {
 		console.log("Initializing landing component!");
-		this.tradeSimService.getUserInfo()
-		.subscribe((res: any) => {
-			let response = res.json();
-			console.log(response);
-			if (res.status == 200) {
-				this.loggedIn = true;
-				this.username = JSON.parse(res._body)["Username"];
-			}
-		}, (error: any) => {
-			console.log("Failed to get user info");
-			console.log(JSON.parse(error._body));
+		let username: any = localStorage.getItem("username");
+		if (username === null) {
 			this.loggedIn = false;
-		});
+		} else {
+			this.loggedIn = true;
+			this.username = username;
+		}
 
 		this.tradeSimService.getArticles(5)
 		.subscribe((res: any) => {

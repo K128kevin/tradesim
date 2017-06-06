@@ -33,10 +33,10 @@
 	<div *ngIf="loggedIn" class="intro-blurb">
 		<span class="home-text">Welcome, {{ username }}!</span>
 		<hr>
-		<span class="home-sub-text">Use our tools to practice trading in a simulated market without any financial risk. Invest with confidence gained through effective practice. Explore our article archives to learn more about investing (coming soon).</span>
+		<span class="home-sub-text">Use our tools to practice trading in a simulated market without any financial risk. Invest with confidence gained through effective practice. Explore our article archives to learn more about investing.</span>
 		<button class="btn-di" (click)="showTradeModal(tradeSimModal)">Start Trading</button>
 	</div>
-	<!-- <div class="article-preview">
+	<div class="article-preview">
 		<h2>Recent Posts</h2>
 		<hr>
 		<span *ngFor="let article of articles" style="text-align: left;">
@@ -50,7 +50,7 @@
 		</span>
 		<hr>
 		<h4><a routerLink="/articles" style="color: white;">See All</a></h4>
-	</div> -->
+	</div>
 </div>
 
 <div bsModal #tradeSimModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" (onHidden)="onHidden()">

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions, Response } from '@angular/http';
 
+const BTC_RATE_URL = "http://api.coindesk.com/v1/bpi/currentprice.json";
 const LOGIN_URL = "api/users/login";
 const USER_INFO_URL = "api/users/me";
 const LOGOUT_URL = "api/users/logout"
@@ -18,7 +19,9 @@ const ALL_ACCOUNT_VALS_URL = "api/users/value";
 const MY_ACCOUNT_VAL_URL = "api/tradesim/accountValue";
 const ARTICLE_BY_ID_URL = "api/articles/";
 const ARTICLES_URL = "api/articles";
-const BTC_RATE_URL = "http://api.coindesk.com/v1/bpi/currentprice.json";
+const GET_COMMENTS_URL = "api/articles/";
+const ADD_COMMENT_URL = "api/content/comments/";
+const DELETE_COMMENT_URL = "api/content/comments/";
 
 @Injectable()
 export class TradeSimService {
@@ -98,6 +101,18 @@ export class TradeSimService {
 
 	public getArticles(limit: number) {
 		return this._http.get(ARTICLES_URL + "?limit=" + limit);
+	}
+
+	public getCommentsForArticle(articleid: string) {
+		return this._http.get(GET_COMMENTS_URL + articleid + "/comments");
+	}
+
+	public addComment(articleid: string, comment: string) {
+		return this._http.post(ADD_COMMENT_URL + articleid, {"content":comment}, this._options)
+	}
+
+	public deleteComment(commentid: string) {
+		return this._http.delete(DELETE_COMMENT_URL + commentid)
 	}
 
 }

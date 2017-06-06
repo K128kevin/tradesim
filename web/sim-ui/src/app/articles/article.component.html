@@ -1,11 +1,30 @@
 <div class="wrapper container general-container" style="text-align: center;">
 	<div *ngIf="article.title !== ''">
 		<h2>{{ article.title }}</h2>
-		<h5> Date Published: {{ article.createdDate | date:'MM/dd/yyyy h:mm:sss a Z' }} </h5>
+		<h5> Date Published: {{ article.createdDate | date:'MM/dd/yyyy h:mm:ss a Z' }} </h5>
 		<h5> Author: {{ article.author }} </h5>
 		<div [innerHTML]="article.content"></div>
 	</div>
 	<div *ngIf="article.title === ''">
 		<h2>Article Not Found :(</h2>
+	</div>
+</div>
+<div class="general-container" style="text-align: center;">
+	<h3>Comments</h3>
+	<hr>
+	<textarea maxlength="8000" rows="4" style="width: 100%;" [(ngModel)]="newComment"></textarea>
+	<button class="btn-di-small" (click)="addComment()">Submit</button>
+	<hr>
+	<div *ngFor="let comment of comments" style="margin: 10px; text-align: left;">
+		<span style="display: inline-block; font-size: 12px; padding: 6px; width: 200px;">
+			{{ comment.username }}
+			<br>
+			{{ comment.time | date:'MM/dd/yyyy h:mm:ss a Z' }}
+		</span>
+		<img *ngIf="comment.username === username || username === 'k128kevin'" (click)="deleteComment(comment.id)" class="delete-icon" style="float: right;" src="/assets/images/icons/delete-icon-1.png"/>
+		<span style="font-size: 20px; margin-left: 200px;">
+			<div [innerHTML]="comment.content"></div>
+		</span>
+		<hr>
 	</div>
 </div>
