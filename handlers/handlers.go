@@ -410,11 +410,7 @@ func GetCommentsForArticle(c *gin.Context) {
 	articleid := c.Param("articleid")
 	var comments []model.Comment
 	comments = services.GetCommentsForArticle(articleid)
-	if len(comments) < 1 {
-		c.JSON(http.StatusNotFound, comments)
-	} else {
-		c.JSON(http.StatusOK, comments)
-	}
+	c.JSON(http.StatusOK, comments)
 }
 
 func AddComment(c *gin.Context) {
