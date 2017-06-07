@@ -40,10 +40,34 @@ export class LandingComponent {
 			console.log(JSON.parse(error._body));
 		});
 
+		this.tradeSimService.getUserInfo()
+		.subscribe((res: any) => {
+			let response = res.json();
+			console.log(response);
+			if (res.status == 200) {
+				console.log("Got user info successfully");
+				localStorage.setItem("username", JSON.parse(res._body)["Username"]);
+				this.loggedIn = true;
+				this.username = localStorage.getItem("username");
+			} else {
+				this.clearUser();
+			}
+		}, (error: any) => {
+			console.log("Failed to get user info");
+			console.log(JSON.parse(error._body));
+			this.clearUser();
+		});
+
 	}
 
 	showTradeModal(tradeModal: any) {
 		this.tradeComponent.showModal(tradeModal);
+	}
+
+	clearUser() {
+		localStorage.clear();
+		this.loggedIn = false;
+		this.username = "";
 	}
 
 }
