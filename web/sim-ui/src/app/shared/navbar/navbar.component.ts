@@ -19,9 +19,9 @@ export class NavBarComponent {
 
 	constructor(private tradeSimService: TradeSimService, private router: Router) {
 		Observable.interval(15000)
-		.subscribe((x) => {
-			this.getBTCRate();
-		});
+		// .subscribe((x) => {
+		// 	this.getBTCRate();
+		// });
 		this.router.events.subscribe((event: NavigationEnd) => {
 			this.getUserInfo();
 		});
@@ -32,7 +32,6 @@ export class NavBarComponent {
 	ngOnInit() {
 		console.log("Initializing navbar component!");
 		this.getAccountVal();
-		this.getBTCRate();
 		this.getUserInfo();
 	}
 
@@ -58,20 +57,20 @@ export class NavBarComponent {
 		});
 	}
 
-	getBTCRate() {
-		this.tradeSimService.getCurrentBTCRate()
-			.subscribe((res: any) => {
-				let response = res.json();
-				console.log(response);
-				if (res.status == 200) {
-					let respData = JSON.parse(res._body);
-					this.btcRate = parseFloat(respData.bpi.USD.rate.replace(/,/g, ""));
-				}
-			}, (error: any) => {
-				console.log("Failed to get current btc rate");
-				console.log(JSON.parse(error._body));
-			});
-	}
+	// getBTCRate() {
+	// 	this.tradeSimService.getCurrentBTCRate()
+	// 		.subscribe((res: any) => {
+	// 			let response = res.json();
+	// 			console.log(response);
+	// 			if (res.status == 200) {
+	// 				let respData = JSON.parse(res._body);
+	// 				this.btcRate = parseFloat(respData.bpi.USD.rate.replace(/,/g, ""));
+	// 			}
+	// 		}, (error: any) => {
+	// 			console.log("Failed to get current btc rate");
+	// 			console.log(JSON.parse(error._body));
+	// 		});
+	// }
 
 	getAccountVal() {
 		this.tradeSimService.getMyAccountValue()

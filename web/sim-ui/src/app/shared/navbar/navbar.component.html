@@ -15,28 +15,31 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a routerLink="">Home</a></li>
+        <li *ngIf="loggedIn" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Trading<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a class="hover-pointer" (click)="showTradeModal(tradeSimModal)">Make A Trade</a></li>
+            <li><a routerLink="/history">Transaction History</a></li>
+            <li><a routerLink="/positions">View Positions</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a (click)="resetBalance()" style="cursor: pointer">Reset Balance</a></li>
+          </ul>
+        </li>
         <li><a routerLink="/leaderboard">Leaderboard</a></li>
         <li><a routerLink="/articles">Articles</a></li>
         <li><a routerLink="/about">About</a></li>
         <li><a routerLink="/contact">Contact</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a>Current BTC Price: ${{ btcRate }}</a></li>
         <li *ngIf="!loggedIn"><a routerLink="/login">Login</a></li>
         <li *ngIf="!loggedIn"><a routerLink="/signup">Signup</a></li>
+        <li *ngIf="loggedIn"><a>Account Value: ${{ accountVal | number : '1.2-2' }}</a></li>
         <li *ngIf="loggedIn"><a>Welcome, {{ user.Username }}!</a></li>
         <li *ngIf="loggedIn" class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a (click)="showTradeModal(tradeSimModal)">Trade</a></li>
-            <li><a routerLink="/history">Transaction History</a></li>
             <li><a routerLink="/profile">Profile</a></li>
-            <li><a routerLink="/positions">Positions</a></li>
             <li><a (click)="logout()" href>Logout</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a (click)="resetBalance()" style="cursor: pointer">Reset Balance</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a>Account Value: ${{ accountVal | number : '1.2-2' }}</a></li>
           </ul>
         </li>
       </ul>
